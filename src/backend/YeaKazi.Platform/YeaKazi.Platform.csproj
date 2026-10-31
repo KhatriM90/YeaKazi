@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YeaKazi.BuildingBlocks\YeaKazi.BuildingBlocks.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="YeaKazi.UnitTests" />
+    <InternalsVisibleTo Include="YeaKazi.IntegrationTests" />
+  </ItemGroup>
+</Project>

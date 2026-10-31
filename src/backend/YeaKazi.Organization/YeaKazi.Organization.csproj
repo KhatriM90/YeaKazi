@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YeaKazi.BuildingBlocks\YeaKazi.BuildingBlocks.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="YeaKazi.UnitTests" />
+    <InternalsVisibleTo Include="YeaKazi.IntegrationTests" />
+  </ItemGroup>
+</Project>
