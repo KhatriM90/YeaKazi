@@ -12,7 +12,15 @@ public sealed record AuditEventDto(
     Guid? LegalEntityId, string ActorKind, Guid? ActorUserId, string? ActorDisplay, Guid? DelegatedActorUserId,
     JsonElement? Before, JsonElement? After, string? Reason, string? CorrelationId, string Hash);
 
-public sealed record AuditSearch(string? Action, string? EntityType, string? EntityId, Guid? ActorUserId, DateTimeOffset? From, DateTimeOffset? To, int? Page, int? PageSize);
+public sealed record AuditSearch(
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "action")] string? Action,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "entityType")] string? EntityType,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "entityId")] string? EntityId,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "actorUserId")] Guid? ActorUserId,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "from")] DateTimeOffset? From,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "to")] DateTimeOffset? To,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "page")] int? Page,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "pageSize")] int? PageSize);
 
 public sealed record AuditChainStatus(bool Valid, long EventsChecked, long? FirstBrokenSeq);
 

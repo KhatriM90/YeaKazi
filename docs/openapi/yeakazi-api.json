@@ -506,28 +506,28 @@
         "operationId": "SearchAuditEvents",
         "parameters": [
           {
-            "name": "Action",
+            "name": "action",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "EntityType",
+            "name": "entityType",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "EntityId",
+            "name": "entityId",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "ActorUserId",
+            "name": "actorUserId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -535,7 +535,7 @@
             }
           },
           {
-            "name": "From",
+            "name": "from",
             "in": "query",
             "schema": {
               "type": "string",
@@ -543,7 +543,7 @@
             }
           },
           {
-            "name": "To",
+            "name": "to",
             "in": "query",
             "schema": {
               "type": "string",
@@ -551,7 +551,7 @@
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -563,7 +563,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -830,7 +830,7 @@
         "operationId": "ListLegalEntities",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -838,21 +838,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -864,7 +864,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -996,7 +996,7 @@
         "operationId": "ListBranches",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1004,21 +1004,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1030,7 +1030,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1162,7 +1162,7 @@
         "operationId": "ListCostCenters",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1170,21 +1170,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1196,7 +1196,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1328,7 +1328,7 @@
         "operationId": "ListGrades",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1336,21 +1336,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1362,7 +1362,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1494,7 +1494,7 @@
         "operationId": "ListDepartments",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1502,21 +1502,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1528,7 +1528,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1660,7 +1660,7 @@
         "operationId": "ListPositions",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1668,21 +1668,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1694,7 +1694,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1826,7 +1826,7 @@
         "operationId": "ListHolidayCalendars",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -1834,21 +1834,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1860,7 +1860,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -2134,7 +2134,7 @@
         "operationId": "ListWorkSchedules",
         "parameters": [
           {
-            "name": "LegalEntityId",
+            "name": "legalEntityId",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2142,21 +2142,21 @@
             }
           },
           {
-            "name": "IncludeInactive",
+            "name": "includeInactive",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -2168,7 +2168,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",

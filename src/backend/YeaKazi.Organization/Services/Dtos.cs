@@ -1,6 +1,11 @@
 namespace YeaKazi.Organization.Services;
 
-public sealed record OrgListQuery(Guid? LegalEntityId, bool? IncludeInactive, string? Search, int? Page, int? PageSize);
+public sealed record OrgListQuery(
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "legalEntityId")] Guid? LegalEntityId,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "includeInactive")] bool? IncludeInactive,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "search")] string? Search,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "page")] int? Page,
+    [property: Microsoft.AspNetCore.Mvc.FromQuery(Name = "pageSize")] int? PageSize);
 
 public sealed record LegalEntityDto(Guid Id, string Code, string Name, string? RegistrationNumber, string? KraPin, string? NssfEmployerNumber, string Timezone, string BaseCurrency, bool IsActive, uint Version);
 public sealed record CreateLegalEntityRequest(string Code, string Name, string? RegistrationNumber, string? KraPin, string? NssfEmployerNumber, string? Timezone);
