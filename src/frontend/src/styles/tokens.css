@@ -27,6 +27,7 @@
   --color-success: #1e7a3c;
   --color-success-bg: #e6f4ea;
   --color-warning-bg: #fdf3e1;
+  --color-warning: #8a5a12;
 
   /* Payroll run status colours (always shown with a text label). */
   --status-draft: #6b7280;
@@ -68,6 +69,7 @@
     --color-success: #4ade80;
     --color-success-bg: #12301f;
     --color-warning-bg: #3a2c12;
+    --color-warning: #f5c06b;
     --status-draft: #9ca3af;
     --status-calculated: #60a5fa;
     --status-in-review: #f6c25b;
@@ -96,6 +98,7 @@
   --color-success: #4ade80;
   --color-success-bg: #12301f;
   --color-warning-bg: #3a2c12;
+  --color-warning: #f5c06b;
   --status-draft: #9ca3af;
   --status-calculated: #60a5fa;
   --status-in-review: #f6c25b;

@@ -7,6 +7,8 @@ using YeaKazi.BuildingBlocks.Http;
 using YeaKazi.BuildingBlocks.Persistence;
 using YeaKazi.Organization;
 using YeaKazi.Organization.Endpoints;
+using YeaKazi.People;
+using YeaKazi.People.Endpoints;
 using YeaKazi.Platform;
 using YeaKazi.Platform.Auth;
 using YeaKazi.Platform.Endpoints;
@@ -24,6 +26,7 @@ public static class ApiSetup
         services.AddYeaKaziPersistence(appConnection);
         services.AddPlatformModule(config);
         services.AddOrganizationModule();
+        services.AddPeopleModule();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
@@ -100,6 +103,7 @@ public static class ApiSetup
 
         app.MapPlatformEndpoints();
         app.MapOrganizationEndpoints(PlatformEndpoints.TenantPolicy);
+        app.MapPeopleEndpoints(PlatformEndpoints.TenantPolicy);
         return app;
     }
 }

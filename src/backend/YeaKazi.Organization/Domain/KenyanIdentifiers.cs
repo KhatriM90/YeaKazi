@@ -1,21 +1,12 @@
-using System.Text.RegularExpressions;
+using YeaKazi.BuildingBlocks.Validation;
 
 namespace YeaKazi.Organization.Domain;
 
-public static partial class KenyanIdentifiers
+public static class KenyanIdentifiers
 {
-    /// <summary>
-    /// Employer KRA PIN. Section 15 gives only the individual pattern (^A\d{9}[A-Z]$); employers
-    /// may be companies (P...) or individuals (A...). See docs/assumptions.md A-06.
-    /// </summary>
-    public static bool IsValidEmployerKraPin(string? pin) => pin is not null && EmployerPin().IsMatch(pin);
+    /// <summary>Employer KRA PIN (companies P..., individuals A...). See docs/assumptions.md A-06.</summary>
+    public static bool IsValidEmployerKraPin(string? pin) => KenyanFormats.IsEmployerKraPin(pin);
 
-    /// <summary>Individual KRA PIN per Section 15 (used from S2 for employees).</summary>
-    public static bool IsValidIndividualKraPin(string? pin) => pin is not null && IndividualPin().IsMatch(pin);
-
-    [GeneratedRegex("^[AP]\\d{9}[A-Z]$")]
-    private static partial Regex EmployerPin();
-
-    [GeneratedRegex("^A\\d{9}[A-Z]$")]
-    private static partial Regex IndividualPin();
+    /// <summary>Individual KRA PIN per Section 15.</summary>
+    public static bool IsValidIndividualKraPin(string? pin) => KenyanFormats.IsIndividualKraPin(pin);
 }

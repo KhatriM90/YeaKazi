@@ -41,6 +41,7 @@ public sealed class TestDatabase
         }
 
         await DatabaseMigrator.MigrateAsync(OwnerConnectionString);
+        await YeaKazi.Platform.Rules.RuleLoader.LoadAsync(OwnerConnectionString, Path.Combine(RepoRoot(), "rules"));
     }
 
     public async Task DropAsync()

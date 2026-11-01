@@ -105,3 +105,21 @@ dialog .dialog-actions { display: flex; justify-content: flex-end; gap: var(--sp
 .qr { background: #fff; padding: var(--space-2); border-radius: var(--radius-sm); width: 200px; height: 200px; }
 .secret { letter-spacing: 0.08em; word-break: break-all; }
 pre.json { background: var(--color-surface-muted); padding: var(--space-3); border-radius: var(--radius-sm); overflow-x: auto; font-size: 0.8rem; max-height: 260px; }
+
+/* S2: people */
+.badge-warn { color: var(--color-warning); }
+td, .num { font-variant-numeric: tabular-nums; }
+dialog.wide { width: min(860px, 96vw); }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 var(--space-4); border-left: 3px solid var(--color-border); display: flex; flex-direction: column; gap: var(--space-3); }
+.timeline li { position: relative; }
+.timeline li::before { content: ''; position: absolute; left: calc(-1 * var(--space-4) - 8px); top: 8px; width: 13px; height: 13px; border-radius: 50%; background: var(--color-primary); border: 2px solid var(--color-surface); }
+.timeline li.cancelled { opacity: 0.65; }
+.timeline li.cancelled::before { background: var(--color-text-muted); }
+.timeline li.future::before { background: var(--color-accent); }
+.recovery-codes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); padding: var(--space-3); background: var(--color-surface-muted); border-radius: var(--radius-sm); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.06em; }
+.steps { display: flex; gap: var(--space-3); list-style: none; padding: 0; margin: 0; flex-wrap: wrap; }
+.steps li { color: var(--color-text-muted); }
+.steps li[aria-current='step'] { color: var(--color-text); font-weight: 600; border-bottom: 3px solid var(--color-accent); }
+dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-4); margin: 0; }
+dl.facts dt { color: var(--color-text-muted); }
+dl.facts dd { margin: 0; }

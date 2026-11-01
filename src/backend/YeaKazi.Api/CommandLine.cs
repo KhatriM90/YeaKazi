@@ -1,11 +1,13 @@
 using YeaKazi.Platform.Auth;
 using YeaKazi.Platform.Domain;
+using YeaKazi.Platform.Rules;
 
 namespace YeaKazi.Api;
 
 /// <summary>
 /// Operator commands:
 ///   migrate                                   apply all migrations (ConnectionStrings:Migrations)
+///   load-rules [--path rules]                load /rules/&lt;jurisdiction&gt; files as immutable RuleVersion records (ConnectionStrings:Migrations)
 ///   create-platform-admin --email E --name N  create a platform administrator; password from YEAKAZI_BOOTSTRAP_PASSWORD
 /// </summary>
 public static class CommandLine
@@ -19,6 +21,14 @@ public static class CommandLine
                             ?? throw new InvalidOperationException("ConnectionStrings:Migrations is not configured.");
                 await DatabaseMigrator.MigrateAsync(owner);
                 Console.WriteLine("Migrations applied.");
+                return true;
+            case "load-rules":
+                var ownerCs = app.Configuration.GetConnectionString("Migrations")
+                              ?? throw new InvalidOperationException("ConnectionStrings:Migrations is not configured.");
+                var path = OptionalArg(args, "--path") ?? "rules";
+                var result = await RuleLoader.LoadAsync(ownerCs, ResolveFolder(path));
+                foreach (var m in result.Messages) Console.WriteLine(m);
+                Console.WriteLine($"Rules loaded: {result.Loaded}; unchanged: {result.Unchanged}.");
                 return true;
             case "create-platform-admin":
                 var email = Arg(args, "--email");
@@ -36,6 +46,35 @@ public static class CommandLine
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// A relative path is looked up from the working directory and then its parents, because
+    /// <c>dotnet run</c> starts in the project folder while the rules live at the repository root.
+    /// </summary>
+    private static string ResolveFolder(string path)
+    {
+        if (Path.IsPathRooted(path))
+        {
+            return path;
+        }
+
+        for (var dir = new DirectoryInfo(Environment.CurrentDirectory); dir is not null; dir = dir.Parent)
+        {
+            var candidate = Path.Combine(dir.FullName, path);
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return Path.GetFullPath(path);
+    }
+
+    private static string? OptionalArg(string[] args, string name)
+    {
+        var i = Array.IndexOf(args, name);
+        return i >= 0 && i + 1 < args.Length ? args[i + 1] : null;
     }
 
     private static string Arg(string[] args, string name)

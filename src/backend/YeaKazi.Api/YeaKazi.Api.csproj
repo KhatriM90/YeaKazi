@@ -20,6 +20,7 @@
     <ProjectReference Include="..\YeaKazi.BuildingBlocks\YeaKazi.BuildingBlocks.csproj" />
     <ProjectReference Include="..\YeaKazi.Platform\YeaKazi.Platform.csproj" />
     <ProjectReference Include="..\YeaKazi.Organization\YeaKazi.Organization.csproj" />
+    <ProjectReference Include="..\YeaKazi.People\YeaKazi.People.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="YeaKazi.IntegrationTests" />

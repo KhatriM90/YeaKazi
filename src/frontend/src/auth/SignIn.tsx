@@ -10,6 +10,8 @@ type Step =
   | { kind: 'password' }
   | { kind: 'mfa'; challengeToken: string }
   | { kind: 'enroll'; challengeToken: string; secret?: string; uri?: string; qr?: string }
+  | { kind: 'recover'; challengeToken: string }
+  | { kind: 'codes'; codes: string[]; res: Schemas['LoginResponse'] }
 
 /**
  * Password sign-in followed by TOTP. Privileged roles must enrol an authenticator app
@@ -26,7 +28,12 @@ export function SignIn({ platform = false }: { platform?: boolean }) {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  async function finish(res: Schemas['LoginResponse']) {
+  async function finish(res: Schemas['LoginResponse'], codesSeen = false) {
+    if (!codesSeen && res.recoveryCodes && res.recoveryCodes.length > 0) {
+      // Shown once, straight after enrolment; the server keeps only hashes.
+      setStep({ kind: 'codes', codes: res.recoveryCodes, res })
+      return
+    }
     if (res.status === 'authenticated' && res.accessToken && res.expiresAt) {
       await signIn(platform ? 'platform' : 'tenant', res.accessToken, res.expiresAt)
       navigate(platform ? '/platform' : '/', { replace: true })
@@ -66,12 +73,14 @@ export function SignIn({ platform = false }: { platform?: boolean }) {
 
   async function submitCode(e: FormEvent) {
     e.preventDefault()
-    if (step.kind === 'password') return
+    if (step.kind === 'password' || step.kind === 'codes') return
     setBusy(true)
     setError(null)
     try {
       const body = { challengeToken: step.challengeToken, code: code.trim() }
-      const res = platform
+      const res = step.kind === 'recover'
+        ? await call(api.POST('/api/v1/auth/mfa/recover', { body: { challengeToken: step.challengeToken, recoveryCode: code.trim() } }))
+        : platform
         ? await call(api.POST('/api/v1/platform/auth/mfa/verify', { body }))
         : await call(api.POST('/api/v1/auth/mfa/verify', { body }))
       await finish(res)
@@ -119,10 +128,51 @@ export function SignIn({ platform = false }: { platform?: boolean }) {
             <h2>Enter your verification code</h2>
             <TextField label="6-digit code" value={code} onChange={setCode} required inputMode="numeric" autoComplete="one-time-code" maxLength={6} autoFocus />
             <button className="btn-primary" disabled={busy}>Verify</button>
+            {!platform && <button type="button" className="btn-link" onClick={() => { setStep({ kind: 'recover', challengeToken: step.challengeToken }); setCode('') }}>Lost your phone? Use a recovery code</button>}
             <button type="button" className="btn-link" onClick={() => { setStep({ kind: 'password' }); setCode('') }}>Start again</button>
           </form>
         )}
+
+        {step.kind === 'recover' && (
+          <form className="stack" onSubmit={submitCode}>
+            <h2>Use a recovery code</h2>
+            <p className="muted">Enter one of the recovery codes you saved when you set up multi-factor sign-in. Each code works once, and we will email you that it was used.</p>
+            <TextField label="Recovery code" value={code} onChange={setCode} required autoComplete="one-time-code" autoFocus placeholder="XXXXX-XXXXX" />
+            <button className="btn-primary" disabled={busy}>Sign in</button>
+            <p className="hint">No codes left? Ask your administrator to reset your multi-factor sign-in.</p>
+            <button type="button" className="btn-link" onClick={() => { setStep({ kind: 'mfa', challengeToken: step.challengeToken }); setCode('') }}>Use my authenticator app instead</button>
+          </form>
+        )}
+
+        {step.kind === 'codes' && <RecoveryCodes codes={step.codes} onDone={() => void finish(step.res, true)} />}
       </div>
     </main>
+  )
+}
+
+/** Shows recovery codes once and asks the user to confirm they saved them. */
+export function RecoveryCodes({ codes, onDone, doneLabel = 'Continue' }: { codes: string[]; onDone: () => void; doneLabel?: string }) {
+  const [saved, setSaved] = useState(false)
+  function download() {
+    const blob = new Blob([`YeaKazi recovery codes\nEach code can be used once.\n\n${codes.join('\n')}\n`], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'yeakazi-recovery-codes.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+  return (
+    <div className="stack">
+      <h2>Save your recovery codes</h2>
+      <p className="muted">If you lose your phone, each of these codes lets you sign in once. Keep them somewhere safe and private. They will not be shown again.</p>
+      <div className="recovery-codes" aria-label="Recovery codes">{codes.map((c) => <span key={c}>{c}</span>)}</div>
+      <div className="row">
+        <button type="button" className="btn-secondary" onClick={download}>Download</button>
+        <button type="button" className="btn-secondary" onClick={() => void navigator.clipboard?.writeText(codes.join('\n'))}>Copy</button>
+      </div>
+      <label className="checkbox"><input type="checkbox" checked={saved} onChange={(e) => setSaved(e.target.checked)} /> I have saved these codes</label>
+      <button type="button" className="btn-primary" disabled={!saved} onClick={onDone}>{doneLabel}</button>
+    </div>
   )
 }

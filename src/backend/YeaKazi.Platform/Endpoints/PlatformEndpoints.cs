@@ -27,6 +27,8 @@ public static class PlatformEndpoints
             => TypedResults.Ok(await svc.BeginEnrollmentAsync(body, ct))).WithName("BeginMfaEnrollment");
         auth.MapPost("/mfa/verify", async Task<Ok<LoginResponse>> (MfaVerifyRequest body, TenantAuthService svc, CancellationToken ct)
             => TypedResults.Ok(await svc.VerifyMfaAsync(body, ct))).WithName("VerifyMfa");
+        auth.MapPost("/mfa/recover", async Task<Ok<LoginResponse>> (MfaRecoverRequest body, TenantAuthService svc, CancellationToken ct)
+            => TypedResults.Ok(await svc.RecoverWithCodeAsync(body, ct))).WithName("RecoverMfa");
         auth.MapPost("/activate", async Task<NoContent> (ActivateRequest body, TenantAuthService svc, CancellationToken ct) =>
         {
             await svc.ActivateAsync(body, ct);
@@ -36,6 +38,9 @@ public static class PlatformEndpoints
         var tenant = app.MapGroup("/api/v1").RequireAuthorization(TenantPolicy);
         tenant.MapGet("/me", async Task<Ok<MeDto>> (UserAdminService svc, CancellationToken ct)
             => TypedResults.Ok(await svc.MeAsync(ct))).WithTags("Me").WithName("GetMe");
+        tenant.MapPost("/me/mfa/recovery-codes", async Task<Ok<RecoveryCodesResponse>> (RegenerateRecoveryCodesRequest body, TenantAuthService svc, CancellationToken ct)
+            => TypedResults.Ok(await svc.RegenerateRecoveryCodesAsync(body, ct))).WithTags("Me").WithName("RegenerateRecoveryCodes")
+            .RequireRateLimiting(AuthRateLimit);
 
         var users = tenant.MapGroup("/users").WithTags("Users");
         users.MapGet("/", async Task<Ok<PagedResult<UserDto>>> (string? search, int? page, int? pageSize, UserAdminService svc, CancellationToken ct)
@@ -51,6 +56,8 @@ public static class PlatformEndpoints
             => TypedResults.Ok(await svc.AssignRoleAsync(id, body, ct))).WithName("AssignUserRole");
         users.MapPost("/{id:guid}/roles/{assignmentId:guid}/revoke", async Task<Ok<UserDto>> (Guid id, Guid assignmentId, RevokeRoleRequest body, UserAdminService svc, CancellationToken ct)
             => TypedResults.Ok(await svc.RevokeRoleAsync(id, assignmentId, body, ct))).WithName("RevokeUserRole");
+        users.MapPost("/{id:guid}/mfa/reset", async Task<Ok<UserDto>> (Guid id, ResetMfaRequest body, UserAdminService svc, CancellationToken ct)
+            => TypedResults.Ok(await svc.ResetMfaAsync(id, body, ct))).WithName("ResetUserMfa");
         users.MapPost("/{id:guid}/disable", async Task<Ok<UserDto>> (Guid id, DisableUserRequest body, UserAdminService svc, CancellationToken ct)
             => TypedResults.Ok(await svc.DisableAsync(id, body, ct))).WithName("DisableUser");
 

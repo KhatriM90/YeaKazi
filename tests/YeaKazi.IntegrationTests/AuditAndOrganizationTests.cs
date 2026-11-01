@@ -81,7 +81,7 @@ public class AuditAndOrganizationTests(ApiFactory factory) : IAsyncLifetime
     public async Task Holiday_changes_publish_an_outbox_event()
     {
         var cal = await TestApi.Body(await Admin.PostAsJsonAsync("/api/v1/org/holiday-calendars", new { legalEntityId = _t.LegalEntityId, code = "H2", name = "Cal" }));
-        await TestApi.EnsureSuccess(await Admin.PostAsJsonAsync($"/api/v1/org/holiday-calendars/{cal["id"]}/holidays", new { date = "2026-11-20", name = "Short notice day", kind = "short_notice" }));
+        await TestApi.EnsureSuccess(await Admin.PostAsJsonAsync($"/api/v1/org/holiday-calendars/{cal["id"]}/holidays", new { date = "2026-11-20", name = "Short notice day", kind = "short_notice", sourceReference = "Gazette Notice No. 1234 of 2026" }));
         await using var db = new NpgsqlConnection(factory.Database.SuperuserConnectionString);
         await db.OpenAsync();
         await using var cmd = new NpgsqlCommand("select count(*) from messaging.outbox_messages where tenant_id = @t and type = 'org.holiday_changed'", db);

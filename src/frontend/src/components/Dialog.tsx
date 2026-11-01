@@ -1,7 +1,7 @@
 import { useEffect, useRef, type FormEvent, type ReactNode } from 'react'
 
 /** Accessible modal built on the native <dialog> element (focus trap and Esc handled by the browser). */
-export function Dialog({ open, title, onClose, onSubmit, submitLabel = 'Save', busy, children, danger }: {
+export function Dialog({ open, title, onClose, onSubmit, submitLabel = 'Save', busy, children, danger, wide }: {
   open: boolean
   title: string
   onClose: () => void
@@ -9,6 +9,7 @@ export function Dialog({ open, title, onClose, onSubmit, submitLabel = 'Save', b
   submitLabel?: string
   busy?: boolean
   danger?: boolean
+  wide?: boolean
   children: ReactNode
 }) {
   const ref = useRef<HTMLDialogElement>(null)
@@ -25,7 +26,7 @@ export function Dialog({ open, title, onClose, onSubmit, submitLabel = 'Save', b
   }
 
   return (
-    <dialog ref={ref} onClose={onClose} aria-labelledby="dialog-title">
+    <dialog ref={ref} onClose={onClose} aria-labelledby="dialog-title" className={wide ? 'wide' : undefined}>
       <form onSubmit={submit}>
         <div className="dialog-body stack">
           <h2 id="dialog-title">{title}</h2>

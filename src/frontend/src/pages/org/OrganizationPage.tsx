@@ -205,8 +205,11 @@ function HolidaysDialog({ calendar, onClose, writable }: { calendar: Row; onClos
   const [rows, setRows] = useState<Schemas['HolidayDto'][]>([])
   const [date, setDate] = useState('')
   const [name, setName] = useState('')
-  const [kind, setKind] = useState('company')
+  const [kind, setKind] = useState('short_notice')
+  const [sourceReference, setSourceReference] = useState('')
+  const [allCalendars, setAllCalendars] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setRows(await call(api.GET('/api/v1/org/holiday-calendars/{id}/holidays', { params: { path: { id: calendar.id }, query: { year: Number(year) } } })))
@@ -215,10 +218,32 @@ function HolidaysDialog({ calendar, onClose, writable }: { calendar: Row; onClos
 
   async function add() {
     setError(null)
+    setNotice(null)
     try {
-      await call(api.POST('/api/v1/org/holiday-calendars/{id}/holidays', { params: { path: { id: calendar.id } }, body: { date, name, kind } }))
+      const source = sourceReference.trim() || null
+      if (kind !== 'company' && allCalendars) {
+        // A government announcement applies to every calendar the user may change.
+        const r = await call(api.POST('/api/v1/org/holidays/announce', { body: { date, name, kind, sourceReference: source ?? '', calendarIds: null } }))
+        setNotice(`Added to ${r.added.length} calendar${r.added.length === 1 ? '' : 's'}${r.skippedCalendarIds.length ? `; ${r.skippedCalendarIds.length} already had this date` : ''}.`)
+      } else {
+        await call(api.POST('/api/v1/org/holiday-calendars/{id}/holidays', { params: { path: { id: calendar.id } }, body: { date, name, kind, sourceReference: source } }))
+      }
       setDate('')
       setName('')
+      setSourceReference('')
+      await load()
+    } catch (err) {
+      setError(messageFor(err))
+    }
+  }
+
+  async function loadStatutory() {
+    setError(null)
+    setNotice(null)
+    try {
+      const r = await call(api.POST('/api/v1/org/holiday-calendars/{id}/load-statutory', { params: { path: { id: calendar.id } }, body: { year: Number(year) } }))
+      setNotice(`Added ${r.added.length} public holidays for ${year}${r.alreadyPresent.length ? ` (${r.alreadyPresent.length} were already there)` : ''}. `
+        + `Add movable holidays yourself when gazetted: ${r.notGenerated.join(', ')}.`)
       await load()
     } catch (err) {
       setError(messageFor(err))
@@ -227,7 +252,7 @@ function HolidaysDialog({ calendar, onClose, writable }: { calendar: Row; onClos
 
   async function deactivate(h: Schemas['HolidayDto']) {
     try {
-      await call(api.PUT('/api/v1/org/holiday-calendars/{id}/holidays/{holidayId}', { params: { path: { id: calendar.id, holidayId: h.id } }, body: { name: h.name, kind: h.kind, isActive: false, version: Number(h.version), reason: 'Removed from calendar' } }))
+      await call(api.PUT('/api/v1/org/holiday-calendars/{id}/holidays/{holidayId}', { params: { path: { id: calendar.id, holidayId: h.id } }, body: { name: h.name, kind: h.kind, sourceReference: h.sourceReference ?? null, isActive: false, version: Number(h.version), reason: 'Removed from calendar' } }))
       await load()
     } catch (err) {
       setError(messageFor(err))
@@ -236,27 +261,37 @@ function HolidaysDialog({ calendar, onClose, writable }: { calendar: Row; onClos
 
   return (
     <Dialog open title={`Holidays · ${calendar.name}`} onClose={onClose} onSubmit={writable ? add : onClose} submitLabel={writable ? 'Add holiday' : 'Close'}>
-      <p className="hint">Gazetted dates are not pre-loaded yet. Add them here, including holidays announced at short notice.</p>
+      <p className="hint">Fixed-date Kenyan public holidays load from the approved rule version (Public Holidays Act, with the Sunday rule). Add Easter, Idd-ul-Fitr and any day the government announces below, with its Gazette notice.</p>
       {error && <div className="alert alert-error" role="alert">{error}</div>}
-      <TextField label="Year" type="number" value={year} onChange={setYear} />
+      {notice && <div className="alert alert-success" role="status">{notice}</div>}
+      <div className="row">
+        <TextField label="Year" type="number" value={year} onChange={setYear} />
+        {writable && <button type="button" className="btn-secondary" onClick={() => void loadStatutory()}>Load {year} public holidays</button>}
+      </div>
       <table>
-        <thead><tr><th>Date</th><th>Name</th><th>Kind</th><th><span className="sr-only">Actions</span></th></tr></thead>
+        <thead><tr><th>Date</th><th>Name</th><th>Kind</th><th>Source</th><th><span className="sr-only">Actions</span></th></tr></thead>
         <tbody>
           {rows.map((h) => (
             <tr key={h.id}><td>{h.date}</td><td>{h.name}</td><td>{h.kind.replace('_', ' ')}</td>
+              <td className="hint">{h.sourceReference ?? '—'}{h.ruleVersion && <div>Rule {h.ruleVersion}</div>}</td>
               <td>{writable && <button type="button" className="btn-link" onClick={() => deactivate(h)}>Remove</button>}</td></tr>
           ))}
-          {rows.length === 0 && <tr><td colSpan={4} className="muted">No holidays for {year}.</td></tr>}
+          {rows.length === 0 && <tr><td colSpan={5} className="muted">No holidays for {year}.</td></tr>}
         </tbody>
       </table>
       {writable && (
-        <div className="grid-2">
-          <TextField label="Date" type="date" value={date} onChange={setDate} required />
-          <TextField label="Name" value={name} onChange={setName} required />
-          <SelectField label="Kind" value={kind} onChange={setKind} options={[
-            { value: 'gazetted', label: 'Gazetted' }, { value: 'short_notice', label: 'Short notice' }, { value: 'company', label: 'Company' },
-          ]} />
-        </div>
+        <fieldset className="stack">
+          <legend>Add a holiday</legend>
+          <div className="grid-2">
+            <TextField label="Date" type="date" value={date} onChange={setDate} required />
+            <TextField label="Name" value={name} onChange={setName} required />
+            <SelectField label="Kind" value={kind} onChange={setKind} options={[
+              { value: 'short_notice', label: 'Announced by government' }, { value: 'gazetted', label: 'Gazetted (movable)' }, { value: 'company', label: 'Company day off' },
+            ]} />
+            {kind !== 'company' && <TextField label="Gazette notice or legal source" value={sourceReference} onChange={setSourceReference} required hint="For example: Gazette Notice No. 1234 of 2026" />}
+          </div>
+          {kind !== 'company' && <Checkbox label="Add to all holiday calendars I manage" checked={allCalendars} onChange={setAllCalendars} />}
+        </fieldset>
       )}
     </Dialog>
   )

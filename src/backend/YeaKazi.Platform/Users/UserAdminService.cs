@@ -26,7 +26,7 @@ public sealed record DisableUserRequest(uint Version, string Reason);
 
 public sealed record RevokeRoleRequest(string Reason);
 
-public sealed record MeDto(Guid UserId, string DisplayName, string Email, Guid TenantId, string TenantName, string TenantSlug, bool MfaEnabled, IReadOnlyList<string> Permissions, IReadOnlyList<RoleAssignmentDto> Roles);
+public sealed record MeDto(Guid UserId, string DisplayName, string Email, Guid TenantId, string TenantName, string TenantSlug, bool MfaEnabled, int RecoveryCodesRemaining, IReadOnlyList<string> Permissions, IReadOnlyList<RoleAssignmentDto> Roles);
 
 public sealed record InvitationMessage(Guid UserId, string Email, string DisplayName, string TenantSlug, string TenantName, string EncryptedToken, DateTimeOffset ExpiresAt);
 
@@ -44,6 +44,7 @@ public sealed class UserAdminService(
     IFieldEncryptor encryptor,
     AuditTrail audit,
     IOptions<AuthOptions> options,
+    MfaRecoveryService recovery,
     TimeProvider clock)
 {
     public async Task<PagedResult<UserDto>> ListAsync(string? search, int? page, int? pageSize, CancellationToken ct)
@@ -78,7 +79,8 @@ public sealed class UserAdminService(
         var tenant = await db.Tenants.AsNoTracking().SingleAsync(t => t.TenantId == context.TenantId, ct);
         var permissions = await AccessControl.LoadForUserAsync(db, userId, ct);
         var roles = await LoadAssignmentsAsync([userId], ct);
-        return new MeDto(user.Id, user.DisplayName, user.Email, tenant.TenantId, tenant.Name, tenant.Slug, user.MfaEnabled,
+        var remaining = user.MfaEnabled ? await recovery.RemainingAsync(userId, ct) : 0;
+        return new MeDto(user.Id, user.DisplayName, user.Email, tenant.TenantId, tenant.Name, tenant.Slug, user.MfaEnabled, remaining,
             permissions.Keys.Order().ToList(), roles.GetValueOrDefault(userId) ?? []);
     }
 
@@ -187,6 +189,40 @@ public sealed class UserAdminService(
         user.SecurityStamp = Guid.NewGuid().ToString("N");
         db.Entry(user).Property(u => u.Version).OriginalValue = request.Version;
         audit.Record(db, "user.disabled", "user", user.Id, before, AuditSnapshot.Of(user), request.Reason);
+        await db.SaveChangesAsync(ct);
+        return await GetAsync(userId, ct);
+    }
+
+    /// <summary>
+    /// Clears a user's MFA after they lose their authenticator and recovery codes. Another
+    /// administrator must do it (never self), with a reason. Sessions are ended and, if the
+    /// user's role needs MFA, they must enrol again at their next sign-in.
+    /// </summary>
+    public async Task<UserDto> ResetMfaAsync(Guid userId, ResetMfaRequest request, CancellationToken ct)
+    {
+        await access.RequireAsync(Permissions.UsersManage, null, ct);
+        new Validator().Required("reason", request.Reason, 1000).ThrowIfInvalid();
+        EnsureNotSelf(userId);
+        var user = await db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct) ?? throw new NotFoundException("User");
+        if (user.Version != request.Version)
+        {
+            throw new ConflictException("concurrency_conflict", "The user was changed by someone else. Reload and try again.");
+        }
+
+        if (!user.MfaEnabled)
+        {
+            throw new BusinessRuleException("mfa_not_enrolled", "This user has not set up multi-factor sign-in.");
+        }
+
+        var before = AuditSnapshot.Of(user);
+        user.MfaEnabled = false;
+        user.MfaSecret = null;
+        user.MfaPendingSecret = null;
+        user.SecurityStamp = Guid.NewGuid().ToString("N");
+        await recovery.RevokeAllAsync(user.Id, ct);
+        db.Entry(user).Property(u => u.Version).OriginalValue = request.Version;
+        audit.Record(db, "user.mfa_reset", "user", user.Id, before, AuditSnapshot.Of(user), request.Reason);
+        await recovery.NotifyAsync(user, SecurityNoticeKinds.MfaReset, ct);
         await db.SaveChangesAsync(ct);
         return await GetAsync(userId, ct);
     }

@@ -35,9 +35,18 @@ public sealed record HolidayCalendarDto(Guid Id, Guid LegalEntityId, string Code
 public sealed record CreateHolidayCalendarRequest(Guid LegalEntityId, string Code, string Name);
 public sealed record UpdateHolidayCalendarRequest(string Name, bool IsActive, uint Version, string? Reason);
 
-public sealed record HolidayDto(Guid Id, Guid CalendarId, DateOnly Date, string Name, string Kind, bool IsActive, uint Version);
-public sealed record CreateHolidayRequest(DateOnly Date, string Name, string Kind);
-public sealed record UpdateHolidayRequest(string Name, string Kind, bool IsActive, uint Version, string? Reason);
+public sealed record HolidayDto(Guid Id, Guid CalendarId, DateOnly Date, string Name, string Kind, string? SourceReference, string? RuleVersion, bool IsActive, uint Version);
+
+/// <summary>SourceReference (e.g. "Gazette Notice No. 1234 of 2026") is required for gazetted and short-notice holidays.</summary>
+public sealed record CreateHolidayRequest(DateOnly Date, string Name, string Kind, string? SourceReference = null);
+public sealed record UpdateHolidayRequest(string Name, string Kind, bool IsActive, uint Version, string? Reason, string? SourceReference = null);
+
+public sealed record LoadStatutoryHolidaysRequest(int Year);
+public sealed record LoadStatutoryHolidaysResult(Guid CalendarId, int Year, IReadOnlyList<HolidayDto> Added, IReadOnlyList<DateOnly> AlreadyPresent, IReadOnlyList<string> NotGenerated);
+
+/// <summary>Adds one announced holiday to several calendars at once (all active calendars the caller may change when CalendarIds is empty).</summary>
+public sealed record AnnounceHolidayRequest(DateOnly Date, string Name, string Kind, string SourceReference, IReadOnlyList<Guid>? CalendarIds);
+public sealed record AnnounceHolidayResult(IReadOnlyList<HolidayDto> Added, IReadOnlyList<Guid> SkippedCalendarIds);
 
 public sealed record WorkScheduleDto(Guid Id, Guid LegalEntityId, string Code, string Name, string StartTime, string EndTime, int BreakMinutes, IReadOnlyList<int> WorkingDays, bool IsOvernight, int ScheduledMinutesPerDay, bool IsActive, uint Version);
 public sealed record CreateWorkScheduleRequest(Guid LegalEntityId, string Code, string Name, string StartTime, string EndTime, int BreakMinutes, IReadOnlyList<int> WorkingDays);

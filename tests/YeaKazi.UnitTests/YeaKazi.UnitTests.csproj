@@ -15,5 +15,6 @@
     <ProjectReference Include="..\..\src\backend\YeaKazi.BuildingBlocks\YeaKazi.BuildingBlocks.csproj" />
     <ProjectReference Include="..\..\src\backend\YeaKazi.Platform\YeaKazi.Platform.csproj" />
     <ProjectReference Include="..\..\src\backend\YeaKazi.Organization\YeaKazi.Organization.csproj" />
+    <ProjectReference Include="..\..\src\backend\YeaKazi.People\YeaKazi.People.csproj" />
   </ItemGroup>
 </Project>
