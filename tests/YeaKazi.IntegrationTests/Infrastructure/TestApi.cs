@@ -10,7 +10,7 @@ using YeaKazi.Platform.Domain;
 
 namespace YeaKazi.IntegrationTests.Infrastructure;
 
-public sealed record SignedIn(string Token, Guid UserId, string Email, string Password, string? MfaSecret);
+public sealed record SignedIn(string Token, Guid UserId, string Email, string Password, string? MfaSecret, IReadOnlyList<string>? RecoveryCodes = null);
 
 public sealed record TenantHandle(Guid TenantId, string Slug, Guid LegalEntityId, Guid AdminUserId, SignedIn Admin);
 
@@ -128,7 +128,7 @@ public sealed class TestApi(ApiFactory factory)
         var verify = await client.PostAsJsonAsync($"{basePath}/mfa/verify", new { challengeToken = result.ChallengeToken, code });
         await EnsureSuccess(verify);
         var done = (await verify.Content.ReadFromJsonAsync<LoginResponse>(Json))!;
-        return new SignedIn(done.AccessToken!, Guid.Empty, string.Empty, Password, secret);
+        return new SignedIn(done.AccessToken!, Guid.Empty, string.Empty, Password, secret, done.RecoveryCodes);
     }
 
     public string CurrentCode(string secret) => Totp.Compute(Base32.Decode(secret), Totp.StepAt(factory.Clock.GetUtcNow()));

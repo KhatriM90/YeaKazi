@@ -149,7 +149,9 @@ public class TenantIsolationTests(ApiFactory factory) : IAsyncLifetime
         [
             "org.legal_entities", "org.branches", "org.departments", "org.positions", "org.cost_centers", "org.grades",
             "org.holiday_calendars", "org.holidays", "org.work_schedules", "iam.users", "iam.roles", "iam.role_permissions",
-            "iam.user_role_assignments", "iam.user_invitations", "audit.audit_events",
+            "iam.user_role_assignments", "iam.user_invitations", "iam.mfa_recovery_codes", "audit.audit_events",
+            "people.employees", "people.emergency_contacts", "people.employment_episodes", "people.assignment_versions",
+            "people.payment_detail_changes", "people.bank_branches", "people.import_batches", "people.import_rows",
         ];
 
         // No tenant set: nothing is visible.
@@ -190,9 +192,10 @@ public class TenantIsolationTests(ApiFactory factory) : IAsyncLifetime
             Assert.Equal(0, await update.ExecuteNonQueryAsync());
         }
 
-        // The app role cannot delete organization data at all.
-        await using (var delete = new NpgsqlCommand("delete from org.branches", conn))
+        // The app role cannot delete organization or people data at all.
+        foreach (var table in new[] { "org.branches", "people.employees", "people.assignment_versions", "people.employment_episodes" })
         {
+            await using var delete = new NpgsqlCommand($"delete from {table}", conn);
             var ex = await Assert.ThrowsAsync<PostgresException>(() => delete.ExecuteNonQueryAsync());
             Assert.Equal(PostgresErrorCodes.InsufficientPrivilege, ex.SqlState);
         }
@@ -222,7 +225,7 @@ public class TenantIsolationTests(ApiFactory factory) : IAsyncLifetime
             Assert.True((long)(await ok.ExecuteScalarAsync())! > 0);
         }
 
-        foreach (var table in new[] { "org.legal_entities", "iam.users", "audit.audit_events", "platform.platform_users" })
+        foreach (var table in new[] { "org.legal_entities", "iam.users", "audit.audit_events", "platform.platform_users", "people.employees", "people.import_rows", "rules.rule_versions" })
         {
             await using var denied = new NpgsqlCommand($"select count(*) from {table}", conn);
             var ex = await Assert.ThrowsAsync<PostgresException>(() => denied.ExecuteScalarAsync());

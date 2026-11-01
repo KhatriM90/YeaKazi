@@ -1,0 +1,33 @@
+{
+  "jurisdiction": "KE",
+  "ruleCode": "calendar.public_holidays",
+  "version": "2026.1",
+  "effectiveFrom": "2026-01-01",
+  "effectiveTo": null,
+  "authoritySource": "Public Holidays Act (Cap. 110), Schedule Part I and section 4, Kenya Law revised text as at 2024-04-26 (https://new.kenyalaw.org/akn/ke/act/1912/21/eng@2024-04-26). Fixed-date list confirmed by the product owner on 2026-11-01.",
+  "applicability": "All employers in Kenya. Generates the fixed-date public holidays of Part I of the Schedule. Movable Part I holidays (Good Friday, Easter Monday, Idd-ul-Fitr) and Part II/III holidays are not generated: administrators add them per year as gazetted, as they do for days declared by Gazette notice under section 3.",
+  "reviewer": null,
+  "approvedAt": null,
+  "status": "seed_pending_specialist_signoff",
+  "payload": {
+    "fixedDates": [
+      { "code": "new_years_day", "name": "New Year's Day", "month": 1, "day": 1 },
+      { "code": "labour_day", "name": "Labour Day", "month": 5, "day": 1 },
+      { "code": "madaraka_day", "name": "Madaraka Day", "month": 6, "day": 1 },
+      { "code": "mazingira_day", "name": "Mazingira Day", "month": 10, "day": 10 },
+      { "code": "mashujaa_day", "name": "Mashujaa Day", "month": 10, "day": 20 },
+      { "code": "jamhuri_day", "name": "Jamhuri Day", "month": 12, "day": 12 },
+      { "code": "christmas_day", "name": "Christmas Day", "month": 12, "day": 25 },
+      { "code": "boxing_day", "name": "Boxing Day", "month": 12, "day": 26 }
+    ],
+    "sundayRule": {
+      "kind": "next_day_not_public_holiday",
+      "source": "Public Holidays Act (Cap. 110), section 4: where a Part I day falls on a Sunday, the first succeeding day that is not a public holiday is a public holiday instead."
+    },
+    "notGenerated": [
+      { "code": "good_friday", "name": "Good Friday", "note": "Movable (Easter). Add per year." },
+      { "code": "easter_monday", "name": "Easter Monday", "note": "Movable (Easter). Add per year." },
+      { "code": "idd_ul_fitr", "name": "Idd-ul-Fitr", "note": "Date depends on the moon; declared by Gazette notice. Add when announced. Section 4 also applies if it falls on a Sunday." }
+    ]
+  }
+}

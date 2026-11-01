@@ -101,6 +101,8 @@ public sealed class OrganizationDbContext(DbContextOptions<OrganizationDbContext
             b.HasAlternateKey(x => new { x.TenantId, x.LegalEntityId, x.Id });
             b.Property(x => x.Name).HasMaxLength(200).IsRequired();
             b.Property(x => x.Kind).HasMaxLength(20).IsRequired();
+            b.Property(x => x.SourceReference).HasMaxLength(300);
+            b.Property(x => x.RuleVersion).HasMaxLength(100);
             b.HasOne<LegalEntity>().WithMany().HasForeignKey(x => new { x.TenantId, x.LegalEntityId })
                 .HasPrincipalKey(x => new { x.TenantId, x.Id }).OnDelete(DeleteBehavior.Restrict);
             b.HasOne<HolidayCalendar>().WithMany()

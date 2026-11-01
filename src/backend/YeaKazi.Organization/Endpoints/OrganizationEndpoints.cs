@@ -106,6 +106,11 @@ public static class OrganizationEndpoints
         org.MapPut("/holiday-calendars/{id:guid}/holidays/{holidayId:guid}", async Task<Ok<HolidayDto>> (Guid id, Guid holidayId, UpdateHolidayRequest body, OrganizationService s, CancellationToken ct)
             => TypedResults.Ok(await s.UpdateHolidayAsync(id, holidayId, body, ct))).WithName("UpdateHoliday");
 
+        org.MapPost("/holiday-calendars/{id:guid}/load-statutory", async Task<Ok<LoadStatutoryHolidaysResult>> (Guid id, LoadStatutoryHolidaysRequest body, OrganizationService s, CancellationToken ct)
+            => TypedResults.Ok(await s.LoadStatutoryHolidaysAsync(id, body, ct))).WithName("LoadStatutoryHolidays");
+        org.MapPost("/holidays/announce", async Task<Ok<AnnounceHolidayResult>> (AnnounceHolidayRequest body, OrganizationService s, CancellationToken ct)
+            => TypedResults.Ok(await s.AnnounceHolidayAsync(body, ct))).WithName("AnnounceHoliday");
+
         org.MapGet("/work-schedules", async Task<Ok<PagedResult<WorkScheduleDto>>> ([AsParameters] OrgListQuery q, OrganizationService s, CancellationToken ct)
             => TypedResults.Ok(await s.ListWorkSchedulesAsync(q, ct))).WithName("ListWorkSchedules");
         org.MapGet("/work-schedules/{id:guid}", async Task<Ok<WorkScheduleDto>> (Guid id, OrganizationService s, CancellationToken ct)

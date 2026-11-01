@@ -27,7 +27,8 @@ public static class LoginStatuses
     public const string MfaEnrollmentRequired = "mfa_enrollment_required";
 }
 
-public sealed record LoginResponse(string Status, string? AccessToken, DateTimeOffset? ExpiresAt, string? ChallengeToken);
+/// <summary>RecoveryCodes is set only once, when MFA enrolment completes; the codes are never shown again.</summary>
+public sealed record LoginResponse(string Status, string? AccessToken, DateTimeOffset? ExpiresAt, string? ChallengeToken, IReadOnlyList<string>? RecoveryCodes = null);
 
 public sealed record MfaEnrollResponse(string Secret, string OtpAuthUri);
 
@@ -39,6 +40,7 @@ public sealed class TenantAuthService(
     IFieldEncryptor encryptor,
     AuditTrail audit,
     IOptions<AuthOptions> options,
+    MfaRecoveryService recovery,
     TimeProvider clock)
 {
     private const string InvalidCredentials = "Email, password or organization is incorrect.";
@@ -159,18 +161,74 @@ public sealed class TenantAuthService(
         user.MfaLastStep = step.Value;
         user.FailedAttempts = 0;
         user.LastLoginAt = now;
+        IReadOnlyList<string>? codes = null;
         if (enrolling)
         {
             user.MfaSecret = user.MfaPendingSecret;
             user.MfaPendingSecret = null;
             user.MfaEnabled = true;
             audit.Record(db, "auth.mfa_enrolled", "user", user.Id);
+            codes = await recovery.IssueAsync(user, ct);
         }
 
         audit.Record(db, "auth.login_succeeded", "user", user.Id, after: AuditSnapshot.Of(new { amr = AuthClaims.AmrMfa }));
         await db.SaveChangesAsync(ct);
         var access = tokens.IssueAccessToken(AuthClaims.ScopeTenant, user.Id, tenantId, user.DisplayName, AuthClaims.AmrMfa, user.SecurityStamp);
+        return new LoginResponse(LoginStatuses.Authenticated, access.Token, access.ExpiresAt, null, codes);
+    }
+
+    /// <summary>
+    /// Second factor by single-use recovery code, for a user who has lost their authenticator.
+    /// Counts towards lockout like a wrong TOTP code; success is audited and emailed to the user.
+    /// </summary>
+    public async Task<LoginResponse> RecoverWithCodeAsync(MfaRecoverRequest request, CancellationToken ct)
+    {
+        var (user, tenantId) = await LoadChallengeUserAsync(request.ChallengeToken, AuthClaims.PurposeMfaVerify, ct);
+        if (!user.MfaEnabled)
+        {
+            throw new UnauthorizedException("invalid_challenge", "The sign-in challenge is missing or has expired.");
+        }
+
+        var left = await recovery.TryConsumeAsync(user, request.RecoveryCode, ct);
+        if (left is null)
+        {
+            await RegisterFailureAsync(user, "wrong_recovery_code", ct);
+            throw new UnauthorizedException("invalid_recovery_code", "The recovery code is incorrect or has already been used.");
+        }
+
+        user.FailedAttempts = 0;
+        user.LastLoginAt = clock.GetUtcNow();
+        audit.Record(db, "auth.mfa_recovery_code_used", "user", user.Id, after: AuditSnapshot.Of(new { remaining = left.Value }));
+        audit.Record(db, "auth.login_succeeded", "user", user.Id, after: AuditSnapshot.Of(new { amr = AuthClaims.AmrMfa, method = "recovery_code" }));
+        await recovery.NotifyAsync(user, SecurityNoticeKinds.RecoveryCodeUsed, ct);
+        await db.SaveChangesAsync(ct);
+        var access = tokens.IssueAccessToken(AuthClaims.ScopeTenant, user.Id, tenantId, user.DisplayName, AuthClaims.AmrMfa, user.SecurityStamp);
         return new LoginResponse(LoginStatuses.Authenticated, access.Token, access.ExpiresAt, null);
+    }
+
+    /// <summary>Replaces the signed-in user's recovery codes after a fresh TOTP check (step-up).</summary>
+    public async Task<RecoveryCodesResponse> RegenerateRecoveryCodesAsync(RegenerateRecoveryCodesRequest request, CancellationToken ct)
+    {
+        var userId = context.ActorUserId ?? throw new ForbiddenException();
+        var user = await db.Users.SingleAsync(u => u.Id == userId, ct);
+        if (!user.MfaEnabled || user.MfaSecret is null)
+        {
+            throw new BusinessRuleException("mfa_not_enrolled", "Set up multi-factor sign-in first.");
+        }
+
+        var step = Totp.Verify(Base32.Decode(encryptor.Decrypt(user.MfaSecret)), request.Code?.Trim(), clock.GetUtcNow(), user.MfaLastStep);
+        if (step is null)
+        {
+            audit.Record(db, "auth.step_up_failed", "user", user.Id, after: AuditSnapshot.Of(new { purpose = "regenerate_recovery_codes" }));
+            await db.SaveChangesAsync(ct);
+            throw new BusinessRuleException("invalid_mfa_code", "The verification code is incorrect or has already been used.");
+        }
+
+        user.MfaLastStep = step.Value;
+        var codes = await recovery.IssueAsync(user, ct);
+        await recovery.NotifyAsync(user, SecurityNoticeKinds.RecoveryCodesRegenerated, ct);
+        await db.SaveChangesAsync(ct);
+        return new RecoveryCodesResponse(codes);
     }
 
     public async Task ActivateAsync(ActivateRequest request, CancellationToken ct)

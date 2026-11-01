@@ -84,6 +84,13 @@ public sealed class Holiday : IEmployerScoped, IVersioned
     public DateOnly Date { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Kind { get; set; } = HolidayKinds.Company;
+
+    /// <summary>Legal basis: Act and section, or the Gazette notice that declared the day.</summary>
+    public string? SourceReference { get; set; }
+
+    /// <summary>Rule version that generated this row (null when an administrator entered it).</summary>
+    public string? RuleVersion { get; set; }
+
     public bool IsActive { get; set; } = true;
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public uint Version { get; set; }

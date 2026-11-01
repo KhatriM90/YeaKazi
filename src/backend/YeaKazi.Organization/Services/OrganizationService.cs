@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using YeaKazi.BuildingBlocks.Audit;
+using YeaKazi.BuildingBlocks.Contracts;
 using YeaKazi.BuildingBlocks.Errors;
 using YeaKazi.BuildingBlocks.Http;
 using YeaKazi.BuildingBlocks.Security;
@@ -13,7 +14,7 @@ namespace YeaKazi.Organization.Services;
 /// touches, version-checked (optimistic concurrency) and audited in the same transaction.
 /// Records are deactivated, never deleted, so history and references stay intact.
 /// </summary>
-public sealed partial class OrganizationService(OrganizationDbContext db, IAccessControl access, AuditTrail audit)
+public sealed partial class OrganizationService(OrganizationDbContext db, IAccessControl access, AuditTrail audit, IRuleCatalog rules)
 {
     public const string HolidayChangedEvent = "org.holiday_changed";
 
@@ -363,36 +364,171 @@ public sealed partial class OrganizationService(OrganizationDbContext db, IAcces
     }
 
     /// <summary>
-    /// Adds a holiday. Holiday dates are entered by administrators: no gazetted dates are
-    /// seeded until an approved source is loaded (docs/assumptions.md A-08). A change emits
-    /// org.holiday_changed so later slices can recalculate unlocked periods only (KEN-15).
+    /// Adds one holiday, e.g. a day the Cabinet Secretary declares at short notice (KEN-15) or a
+    /// movable holiday such as Good Friday. Gazetted and short-notice days need their legal source.
+    /// A change emits org.holiday_changed so later slices recalculate unlocked periods only.
     /// </summary>
     public async Task<HolidayDto> AddHolidayAsync(Guid calendarId, CreateHolidayRequest r, CancellationToken ct)
     {
         var calendar = await GetAsync<HolidayCalendar>(calendarId, ct);
         await access.RequireAsync(Permissions.OrgWrite, calendar.LegalEntityId, ct);
-        new Validator()
-            .Required("name", r.Name, 200)
-            .Must(HolidayKinds.All.Contains(r.Kind ?? string.Empty), "kind", "Kind must be gazetted, short_notice or company.")
-            .Must(r.Date.Year is >= 2000 and <= 2100, "date", "Enter a valid date.")
-            .ThrowIfInvalid();
+        ValidateHoliday(r.Date, r.Name, r.Kind, r.SourceReference).ThrowIfInvalid();
+        var holiday = await AddHolidayCoreAsync(calendar, r.Date, r.Name.Trim(), r.Kind, Clean(r.SourceReference), null, null, ct)
+            ?? throw new ConflictException("duplicate_holiday", "This calendar already has a holiday on that date.");
+        await db.SaveChangesAsync(ct);
+        return Map(holiday);
+    }
+
+    /// <summary>Adds an announced holiday to several calendars in one step; calendars that already have that date are skipped.</summary>
+    public async Task<AnnounceHolidayResult> AnnounceHolidayAsync(AnnounceHolidayRequest r, CancellationToken ct)
+    {
+        var scope = await access.ScopeAsync(Permissions.OrgWrite, ct);
+        if (!scope.Granted)
+        {
+            throw new ForbiddenException();
+        }
+
+        var v = ValidateHoliday(r.Date, r.Name, r.Kind, r.SourceReference);
+        v.Must(r.Kind != HolidayKinds.Company, "kind", "Use the calendar's own holiday list for company days.");
+        v.ThrowIfInvalid();
+
+        var query = db.HolidayCalendars.Where(c => c.IsActive);
+        if (r.CalendarIds is { Count: > 0 } ids)
+        {
+            query = query.Where(c => ids.Contains(c.Id));
+        }
+
+        var calendars = (await query.OrderBy(c => c.Code).ToListAsync(ct)).Where(c => scope.Allows(c.LegalEntityId)).ToList();
+        if (r.CalendarIds is { Count: > 0 } wanted && calendars.Count != wanted.Distinct().Count())
+        {
+            throw new NotFoundException("Holiday calendar");
+        }
+
+        if (calendars.Count == 0)
+        {
+            throw new BusinessRuleException("no_calendars", "There is no active holiday calendar you can change.");
+        }
+
+        var added = new List<HolidayDto>();
+        var skipped = new List<Guid>();
+        foreach (var calendar in calendars)
+        {
+            var h = await AddHolidayCoreAsync(calendar, r.Date, r.Name.Trim(), r.Kind, r.SourceReference.Trim(), null, "announced", ct);
+            if (h is null)
+            {
+                skipped.Add(calendar.Id);
+            }
+            else
+            {
+                added.Add(Map(h));
+            }
+        }
+
+        audit.Record(db, "org.holiday.announced", "holiday", null,
+            after: AuditSnapshot.Of(new { r.Date, name = r.Name.Trim(), r.Kind, sourceReference = r.SourceReference.Trim(), calendars = added.Select(a => a.CalendarId), skipped }));
+        await db.SaveChangesAsync(ct);
+        return new AnnounceHolidayResult(added, skipped);
+    }
+
+    /// <summary>
+    /// Fills a calendar with the year's statutory public holidays from the loaded rule version
+    /// (rules/ke/calendar). Idempotent: dates already in the calendar are left alone.
+    /// </summary>
+    public async Task<LoadStatutoryHolidaysResult> LoadStatutoryHolidaysAsync(Guid calendarId, LoadStatutoryHolidaysRequest r, CancellationToken ct)
+    {
+        var calendar = await GetAsync<HolidayCalendar>(calendarId, ct);
+        await access.RequireAsync(Permissions.OrgWrite, calendar.LegalEntityId, ct);
+        new Validator().Must(r.Year is >= 2000 and <= 2100, "year", "Enter a year between 2000 and 2100.").ThrowIfInvalid();
         if (!calendar.IsActive)
         {
             throw new BusinessRuleException("inactive_calendar", "The calendar is inactive.");
         }
 
-        if (await db.Holidays.AnyAsync(h => h.CalendarId == calendarId && h.Date == r.Date && h.IsActive, ct))
+        var result = await LoadStatutoryCoreAsync(calendar, r.Year, ct)
+            ?? throw new BusinessRuleException("no_rule_version", $"No public-holiday rule version is loaded for {r.Year}. Ask the platform operator to load the Kenya rule pack.");
+        await db.SaveChangesAsync(ct);
+        return result;
+    }
+
+    internal async Task<LoadStatutoryHolidaysResult?> LoadStatutoryCoreAsync(HolidayCalendar calendar, int year, CancellationToken ct)
+    {
+        var from = new DateOnly(year, 1, 1);
+        var to = new DateOnly(year, 12, 31);
+        var versions = await rules.VersionsAsync(RuleCodes.Kenya, RuleCodes.PublicHolidays, from, to, ct);
+        if (versions.Count == 0)
         {
-            throw new ConflictException("duplicate_holiday", "This calendar already has a holiday on that date.");
+            return null;
         }
 
-        var holiday = new Holiday { LegalEntityId = calendar.LegalEntityId, CalendarId = calendarId, Date = r.Date, Name = r.Name.Trim(), Kind = r.Kind! };
-        db.Holidays.Add(holiday);
-        audit.Record(db, "org.holiday.created", "holiday", holiday.Id, after: AuditSnapshot.Of(holiday), legalEntityId: calendar.LegalEntityId);
-        audit.Enqueue(db, HolidayChangedEvent, new { holiday.LegalEntityId, holiday.CalendarId, holiday.Date, change = "added" });
-        await db.SaveChangesAsync(ct);
-        return Map(holiday);
+        var existing = await db.Holidays.AsNoTracking()
+            .Where(h => h.CalendarId == calendar.Id && h.IsActive && h.Date >= from && h.Date <= to)
+            .ToListAsync(ct);
+        var otherPublic = existing.Where(h => h.Kind != HolidayKinds.Company && h.RuleVersion == null).Select(h => h.Date).ToHashSet();
+        var generated = PublicHolidays.Generate(year, versions, otherPublic);
+
+        var added = new List<HolidayDto>();
+        var present = new List<DateOnly>();
+        foreach (var g in generated)
+        {
+            var source = versions.First(v => g.RuleVersion.EndsWith(" " + v.Version, StringComparison.Ordinal)).AuthoritySource;
+            var h = await AddHolidayCoreAsync(calendar, g.Date, PublicHolidays.DisplayName(g), HolidayKinds.Gazetted, Truncate(source, 300), g.RuleVersion, "rule_pack", ct);
+            if (h is null)
+            {
+                present.Add(g.Date);
+            }
+            else
+            {
+                added.Add(Map(h));
+            }
+        }
+
+        var notGenerated = versions
+            .SelectMany(v => v.Payload.TryGetProperty("notGenerated", out var ng) ? ng.EnumerateArray().Select(x => x.GetProperty("name").GetString()!) : [])
+            .Distinct().ToList();
+        audit.Record(db, "org.holiday_calendar.statutory_loaded", "holiday_calendar", calendar.Id,
+            after: AuditSnapshot.Of(new { year, ruleVersions = versions.Select(v => v.Version), added = added.Select(a => a.Date), alreadyPresent = present }),
+            legalEntityId: calendar.LegalEntityId);
+        return new LoadStatutoryHolidaysResult(calendar.Id, year, added, present, notGenerated);
     }
+
+    /// <summary>Adds the holiday unless the calendar already has an active one on that date (returns null then).</summary>
+    private async Task<Holiday?> AddHolidayCoreAsync(HolidayCalendar calendar, DateOnly date, string name, string kind, string? source, string? ruleVersion, string? via, CancellationToken ct)
+    {
+        if (!calendar.IsActive)
+        {
+            throw new BusinessRuleException("inactive_calendar", "The calendar is inactive.");
+        }
+
+        if (await db.Holidays.AnyAsync(h => h.CalendarId == calendar.Id && h.Date == date && h.IsActive, ct)
+            || db.Holidays.Local.Any(h => h.CalendarId == calendar.Id && h.Date == date && h.IsActive))
+        {
+            return null;
+        }
+
+        var holiday = new Holiday
+        {
+            LegalEntityId = calendar.LegalEntityId,
+            CalendarId = calendar.Id,
+            Date = date,
+            Name = name,
+            Kind = kind,
+            SourceReference = source,
+            RuleVersion = ruleVersion,
+        };
+        db.Holidays.Add(holiday);
+        audit.Record(db, "org.holiday.created", "holiday", holiday.Id, after: AuditSnapshot.Of(holiday), reason: via, legalEntityId: calendar.LegalEntityId);
+        audit.Enqueue(db, HolidayChangedEvent, new { holiday.LegalEntityId, holiday.CalendarId, holiday.Date, change = "added" });
+        return holiday;
+    }
+
+    private static Validator ValidateHoliday(DateOnly date, string? name, string? kind, string? source)
+        => new Validator()
+            .Required("name", name, 200)
+            .Must(HolidayKinds.All.Contains(kind ?? string.Empty), "kind", "Kind must be gazetted, short_notice or company.")
+            .Must(date.Year is >= 2000 and <= 2100, "date", "Enter a valid date.")
+            .Optional("sourceReference", source, 300)
+            .Must(kind == HolidayKinds.Company || !string.IsNullOrWhiteSpace(source), "sourceReference",
+                "Give the legal source, for example the Gazette notice number.");
 
     public async Task<HolidayDto> UpdateHolidayAsync(Guid calendarId, Guid holidayId, UpdateHolidayRequest r, CancellationToken ct)
     {
@@ -401,9 +537,9 @@ public sealed partial class OrganizationService(OrganizationDbContext db, IAcces
         var holiday = await db.Holidays.SingleOrDefaultAsync(h => h.Id == holidayId && h.CalendarId == calendarId, ct)
             ?? throw new NotFoundException("Holiday");
         CheckVersion(holiday, holiday.Version, r.Version);
-        new Validator()
-            .Required("name", r.Name, 200)
-            .Must(HolidayKinds.All.Contains(r.Kind ?? string.Empty), "kind", "Kind must be gazetted, short_notice or company.")
+        var source = Clean(r.SourceReference) ?? holiday.SourceReference;
+        ValidateHoliday(holiday.Date, r.Name, r.Kind, source)
+            .Required("reason", holiday.IsActive && !r.IsActive ? r.Reason : "n/a", 1000)
             .Optional("reason", r.Reason, 1000)
             .ThrowIfInvalid();
         if (r.IsActive && !holiday.IsActive
@@ -416,6 +552,7 @@ public sealed partial class OrganizationService(OrganizationDbContext db, IAcces
         var wasActive = holiday.IsActive;
         holiday.Name = r.Name.Trim();
         holiday.Kind = r.Kind!;
+        holiday.SourceReference = source;
         holiday.IsActive = r.IsActive;
         audit.Record(db, ActionFor("holiday", wasActive, holiday.IsActive), "holiday", holiday.Id, before, AuditSnapshot.Of(holiday), r.Reason, calendar.LegalEntityId);
         if (wasActive != holiday.IsActive)
@@ -426,6 +563,8 @@ public sealed partial class OrganizationService(OrganizationDbContext db, IAcces
         await db.SaveChangesAsync(ct);
         return Map(holiday);
     }
+
+    private static string Truncate(string value, int max) => value.Length <= max ? value : value[..(max - 1)] + "…";
 
     // ---------- Work schedules ----------
 
@@ -645,6 +784,6 @@ public sealed partial class OrganizationService(OrganizationDbContext db, IAcces
     private static DepartmentDto Map(Department x) => new(x.Id, x.LegalEntityId, x.Code, x.Name, x.ParentDepartmentId, x.CostCenterId, x.IsActive, x.Version);
     private static PositionDto Map(Position x) => new(x.Id, x.LegalEntityId, x.Code, x.Name, x.DepartmentId, x.GradeId, x.BranchId, x.ReportsToPositionId, x.IsActive, x.Version);
     private static HolidayCalendarDto Map(HolidayCalendar x) => new(x.Id, x.LegalEntityId, x.Code, x.Name, x.IsActive, x.Version);
-    private static HolidayDto Map(Holiday x) => new(x.Id, x.CalendarId, x.Date, x.Name, x.Kind, x.IsActive, x.Version);
+    private static HolidayDto Map(Holiday x) => new(x.Id, x.CalendarId, x.Date, x.Name, x.Kind, x.SourceReference, x.RuleVersion, x.IsActive, x.Version);
     private static WorkScheduleDto Map(WorkSchedule x) => new(x.Id, x.LegalEntityId, x.Code, x.Name, x.StartTime.ToString("HH:mm"), x.EndTime.ToString("HH:mm"), x.BreakMinutes, x.WorkingDays, x.IsOvernight, x.ScheduledMinutesPerDay, x.IsActive, x.Version);
 }

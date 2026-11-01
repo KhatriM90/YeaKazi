@@ -1,0 +1,12 @@
+7,kra_pin
+19,national_id
+25,department_code
+34,pay_basis
+46,emergency_contact_phone
+54,work_permit_no
+60,phone_mobile
+68,date_of_birth
+99,hire_date
+122,employee_number
+152,manager_employee_number
+190,worker_category

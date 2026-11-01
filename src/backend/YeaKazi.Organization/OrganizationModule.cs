@@ -14,6 +14,7 @@ public static class OrganizationModule
         services.AddScoped<OrganizationService>();
         services.AddScoped<IOrganizationProvisioning, OrganizationProvisioning>();
         services.AddScoped<IOrganizationDirectory, OrganizationDirectory>();
+        services.AddScoped<IOrganizationReferences, OrganizationReferences>();
         return services;
     }
 }

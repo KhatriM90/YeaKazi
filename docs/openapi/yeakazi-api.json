@@ -96,6 +96,36 @@
         }
       }
     },
+    "/api/v1/auth/mfa/recover": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RecoverMfa",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaRecoverRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/activate": {
       "post": {
         "tags": [
@@ -132,6 +162,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/mfa/recovery-codes": {
+      "post": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "RegenerateRecoveryCodes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegenerateRecoveryCodesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesResponse"
                 }
               }
             }
@@ -323,6 +383,47 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RevokeRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/mfa/reset": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "ResetUserMfa",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetMfaRequest"
               }
             }
           },
@@ -2126,6 +2227,77 @@
         }
       }
     },
+    "/api/v1/org/holiday-calendars/{id}/load-statutory": {
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "LoadStatutoryHolidays",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoadStatutoryHolidaysRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoadStatutoryHolidaysResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/org/holidays/announce": {
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "operationId": "AnnounceHoliday",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnounceHolidayRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnounceHolidayResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/org/work-schedules": {
       "get": {
         "tags": [
@@ -2291,6 +2463,1114 @@
           }
         }
       }
+    },
+    "/api/v1/people/employees": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListEmployees",
+        "parameters": [
+          {
+            "name": "legalEntityId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfEmployeeSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "CreateEmployee",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEmployeeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "GetEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "UpdateEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmployeeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/emergency-contacts": {
+      "put": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ReplaceEmergencyContacts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceEmergencyContactsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/history": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "GetEmployeeHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/assignments": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "AddAssignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddAssignmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/assignments/{versionId}/correct": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "CorrectAssignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectAssignmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/assignments/{versionId}/cancel": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "CancelAssignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelAssignmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/terminate": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "TerminateEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerminateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/rescind-termination": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "RescindTermination",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RescindTerminationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/rehire": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "RehireEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RehireRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeHistoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/employees/{id}/payment-changes": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "RequestPaymentChange",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPaymentChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentChangeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/payment-changes": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListPaymentChanges",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "legalEntityId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfPaymentChangeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/payment-changes/{id}/approve": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ApprovePaymentChange",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecidePaymentChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentChangeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/payment-changes/{id}/reject": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "RejectPaymentChange",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecidePaymentChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentChangeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/work-permit-alerts": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListWorkPermitAlerts",
+        "parameters": [
+          {
+            "name": "legalEntityId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkPermitAlertDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/bank-branches": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListBankBranches",
+        "parameters": [
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BankBranchDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "CreateBankBranch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBankBranchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankBranchDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/bank-branches/{id}": {
+      "put": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "UpdateBankBranch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBankBranchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankBranchDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports/columns": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListImportColumns",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportColumnDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports/template": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "DownloadImportTemplate",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "UploadImport",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportBatchDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListImports",
+        "parameters": [
+          {
+            "name": "legalEntityId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfImportBatchDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports/{id}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "GetImport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportBatchDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports/{id}/rows": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListImportRows",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "onlyErrors",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfImportRowDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports/{id}/commit": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "CommitImport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportBatchDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/people/imports/{id}/discard": {
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "DiscardImport",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportBatchDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2311,6 +3591,380 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "AddAssignmentRequest": {
+        "required": [
+          "effectiveFrom",
+          "changeType",
+          "assignment",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "changeType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "assignment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentInput"
+              }
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AnnounceHolidayRequest": {
+        "required": [
+          "date",
+          "name",
+          "kind",
+          "sourceReference",
+          "calendarIds"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "sourceReference": {
+            "type": "string"
+          },
+          "calendarIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "AnnounceHolidayResult": {
+        "required": [
+          "added",
+          "skippedCalendarIds"
+        ],
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HolidayDto"
+            }
+          },
+          "skippedCalendarIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "AssignmentDto": {
+        "required": [
+          "id",
+          "episodeId",
+          "effectiveFrom",
+          "effectiveTo",
+          "changeType",
+          "status",
+          "workerCategory",
+          "payBasis",
+          "jobTitle",
+          "contractEndDate",
+          "probationEndDate",
+          "departmentId",
+          "positionId",
+          "branchId",
+          "costCenterId",
+          "gradeId",
+          "workScheduleId",
+          "managerEmployeeId",
+          "managerName",
+          "reason",
+          "correctsVersionId",
+          "isCancelled",
+          "cancelReason",
+          "cancelledAt",
+          "createdAt",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "episodeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "changeType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "workerCategory": {
+            "type": "string"
+          },
+          "payBasis": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contractEndDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "probationEndDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "departmentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "positionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "costCenterId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "workScheduleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "managerEmployeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "managerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "correctsVersionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "isCancelled": {
+            "type": "boolean"
+          },
+          "cancelReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cancelledAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "AssignmentInput": {
+        "required": [
+          "workerCategory",
+          "payBasis",
+          "jobTitle",
+          "contractEndDate",
+          "probationEndDate",
+          "departmentId",
+          "positionId",
+          "branchId",
+          "costCenterId",
+          "gradeId",
+          "workScheduleId",
+          "managerEmployeeId"
+        ],
+        "type": "object",
+        "properties": {
+          "workerCategory": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "payBasis": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "jobTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contractEndDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "probationEndDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "departmentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "positionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "costCenterId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "workScheduleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "managerEmployeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -2460,6 +4114,47 @@
           }
         }
       },
+      "BankBranchDto": {
+        "required": [
+          "id",
+          "bankCode",
+          "bankName",
+          "branchCode",
+          "branchName",
+          "isActive",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bankCode": {
+            "type": "string"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "branchCode": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
       "BranchDto": {
         "required": [
           "id",
@@ -2494,6 +4189,63 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "CancelAssignmentRequest": {
+        "required": [
+          "reason",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "CorrectAssignmentRequest": {
+        "required": [
+          "assignment",
+          "reason",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "assignment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentInput"
+              }
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -2540,6 +4292,41 @@
               "string"
             ],
             "format": "uint32"
+          }
+        }
+      },
+      "CreateBankBranchRequest": {
+        "required": [
+          "bankCode",
+          "bankName",
+          "branchCode",
+          "branchName"
+        ],
+        "type": "object",
+        "properties": {
+          "bankCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "branchCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "branchName": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2626,6 +4413,87 @@
           }
         }
       },
+      "CreateEmployeeRequest": {
+        "required": [
+          "legalEntityId",
+          "employeeNumber",
+          "hireDate",
+          "personal",
+          "identifiers",
+          "emergencyContacts",
+          "assignment",
+          "paymentDetails"
+        ],
+        "type": "object",
+        "properties": {
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "hireDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "personal": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PersonalInput"
+              }
+            ]
+          },
+          "identifiers": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/IdentifiersInput"
+              }
+            ]
+          },
+          "emergencyContacts": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/EmergencyContactInput"
+            }
+          },
+          "assignment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentInput"
+              }
+            ]
+          },
+          "paymentDetails": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PaymentDetailsInput"
+              }
+            ]
+          }
+        }
+      },
       "CreateGradeRequest": {
         "required": [
           "legalEntityId",
@@ -2692,6 +4560,12 @@
           },
           "kind": {
             "type": "string"
+          },
+          "sourceReference": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2868,6 +4742,29 @@
           }
         }
       },
+      "DecidePaymentChangeRequest": {
+        "required": [
+          "note",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
       "DepartmentDto": {
         "required": [
           "id",
@@ -2938,6 +4835,386 @@
             "format": "uint32"
           },
           "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "EmergencyContactDto": {
+        "required": [
+          "id",
+          "name",
+          "relationship",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "relationship": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "EmergencyContactInput": {
+        "required": [
+          "name",
+          "relationship",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "relationship": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "EmployeeDto": {
+        "required": [
+          "id",
+          "legalEntityId",
+          "employeeNumber",
+          "status",
+          "personal",
+          "identifiers",
+          "sensitiveMasked",
+          "emergencyContacts",
+          "paymentDetails",
+          "pendingPaymentChange",
+          "currentEpisode",
+          "currentAssignment",
+          "statutoryGaps",
+          "workPermitAlert",
+          "importBatchId",
+          "version",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeNumber": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "personal": {
+            "$ref": "#/components/schemas/PersonalDto"
+          },
+          "identifiers": {
+            "$ref": "#/components/schemas/IdentifiersDto"
+          },
+          "sensitiveMasked": {
+            "type": "boolean"
+          },
+          "emergencyContacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmergencyContactDto"
+            }
+          },
+          "paymentDetails": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PaymentDetailsDto"
+              }
+            ]
+          },
+          "pendingPaymentChange": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PaymentChangeDto"
+              }
+            ]
+          },
+          "currentEpisode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EpisodeDto"
+              }
+            ]
+          },
+          "currentAssignment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentDto"
+              }
+            ]
+          },
+          "statutoryGaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "workPermitAlert": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "importBatchId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EmployeeHistoryDto": {
+        "required": [
+          "employeeId",
+          "today",
+          "episodes"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "today": {
+            "type": "string",
+            "format": "date"
+          },
+          "episodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EpisodeHistoryDto"
+            }
+          }
+        }
+      },
+      "EmployeeSummaryDto": {
+        "required": [
+          "id",
+          "legalEntityId",
+          "employeeNumber",
+          "fullName",
+          "status",
+          "jobTitle",
+          "workerCategory",
+          "departmentId",
+          "positionId",
+          "branchId",
+          "hireDate",
+          "terminationDate",
+          "statutoryGaps"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeNumber": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "workerCategory": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "departmentId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "positionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "hireDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "terminationDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "statutoryGaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "EpisodeDto": {
+        "required": [
+          "id",
+          "sequence",
+          "hireDate",
+          "terminationDate",
+          "terminationType",
+          "terminationReason",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sequence": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "hireDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "terminationDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "terminationType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "terminationReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "EpisodeHistoryDto": {
+        "required": [
+          "episode",
+          "versions"
+        ],
+        "type": "object",
+        "properties": {
+          "episode": {
+            "$ref": "#/components/schemas/EpisodeDto"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssignmentDto"
+            }
+          }
+        }
+      },
+      "FieldError": {
+        "required": [
+          "field",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
             "type": "string"
           }
         }
@@ -3034,6 +5311,8 @@
           "date",
           "name",
           "kind",
+          "sourceReference",
+          "ruleVersion",
           "isActive",
           "version"
         ],
@@ -3057,6 +5336,18 @@
           "kind": {
             "type": "string"
           },
+          "sourceReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ruleVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "isActive": {
             "type": "boolean"
           },
@@ -3067,6 +5358,336 @@
               "string"
             ],
             "format": "uint32"
+          }
+        }
+      },
+      "IdentifiersDto": {
+        "required": [
+          "nationalId",
+          "passportNo",
+          "workPermitNo",
+          "workPermitExpiry",
+          "kraPin",
+          "nssfNo",
+          "shaNo",
+          "helbRef",
+          "disabilityCertNo",
+          "disabilityCertExpiry"
+        ],
+        "type": "object",
+        "properties": {
+          "nationalId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "passportNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "workPermitNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "workPermitExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "kraPin": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nssfNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "shaNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "helbRef": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "disabilityCertNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "disabilityCertExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "IdentifiersInput": {
+        "required": [
+          "nationalId",
+          "passportNo",
+          "workPermitNo",
+          "workPermitExpiry",
+          "kraPin",
+          "nssfNo",
+          "shaNo",
+          "helbRef",
+          "disabilityCertNo",
+          "disabilityCertExpiry"
+        ],
+        "type": "object",
+        "properties": {
+          "nationalId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "passportNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "workPermitNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "workPermitExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "kraPin": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nssfNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "shaNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "helbRef": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "disabilityCertNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "disabilityCertExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "ImportBatchDto": {
+        "required": [
+          "id",
+          "legalEntityId",
+          "fileName",
+          "status",
+          "totalRows",
+          "errorRows",
+          "validRows",
+          "uploadedByUserId",
+          "uploadedByDisplay",
+          "uploadedAt",
+          "committedByUserId",
+          "committedAt",
+          "canCommit",
+          "commitBlockedReason",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "totalRows": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "errorRows": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "validRows": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "uploadedByUserId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "uploadedByDisplay": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "committedByUserId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "committedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "canCommit": {
+            "type": "boolean"
+          },
+          "commitBlockedReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "ImportColumnDto": {
+        "required": [
+          "name",
+          "required",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "ImportRowDto": {
+        "required": [
+          "rowNumber",
+          "employeeNumber",
+          "name",
+          "errors",
+          "employeeId"
+        ],
+        "type": "object",
+        "properties": {
+          "rowNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "employeeNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldError"
+            }
+          },
+          "employeeId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -3158,6 +5779,65 @@
           }
         }
       },
+      "LoadStatutoryHolidaysRequest": {
+        "required": [
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "LoadStatutoryHolidaysResult": {
+        "required": [
+          "calendarId",
+          "year",
+          "added",
+          "alreadyPresent",
+          "notGenerated"
+        ],
+        "type": "object",
+        "properties": {
+          "calendarId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "year": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "added": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HolidayDto"
+            }
+          },
+          "alreadyPresent": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "notGenerated": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "LoginRequest": {
         "required": [
           "tenant",
@@ -3207,6 +5887,15 @@
               "null",
               "string"
             ]
+          },
+          "recoveryCodes": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -3219,6 +5908,7 @@
           "tenantName",
           "tenantSlug",
           "mfaEnabled",
+          "recoveryCodesRemaining",
           "permissions",
           "roles"
         ],
@@ -3246,6 +5936,14 @@
           },
           "mfaEnabled": {
             "type": "boolean"
+          },
+          "recoveryCodesRemaining": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           },
           "permissions": {
             "type": "array",
@@ -3283,6 +5981,21 @@
             "type": "string"
           },
           "otpAuthUri": {
+            "type": "string"
+          }
+        }
+      },
+      "MfaRecoverRequest": {
+        "required": [
+          "challengeToken",
+          "recoveryCode"
+        ],
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string"
+          },
+          "recoveryCode": {
             "type": "string"
           }
         }
@@ -3466,6 +6179,47 @@
           }
         }
       },
+      "PagedResultOfEmployeeSummaryDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeSummaryDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "PagedResultOfGradeDto": {
         "required": [
           "items",
@@ -3548,6 +6302,88 @@
           }
         }
       },
+      "PagedResultOfImportBatchDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportBatchDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResultOfImportRowDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportRowDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "PagedResultOfLegalEntityDto": {
         "required": [
           "items",
@@ -3561,6 +6397,47 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LegalEntityDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PagedResultOfPaymentChangeDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentChangeDto"
             }
           },
           "page": {
@@ -3753,6 +6630,237 @@
           }
         }
       },
+      "PaymentChangeDto": {
+        "required": [
+          "id",
+          "employeeId",
+          "employeeNumber",
+          "employeeName",
+          "legalEntityId",
+          "paymentMethod",
+          "bankCode",
+          "bankBranchCode",
+          "accountNo",
+          "accountName",
+          "mpesaPhone",
+          "source",
+          "status",
+          "reason",
+          "requestedByUserId",
+          "requestedAt",
+          "decidedByUserId",
+          "decidedAt",
+          "decisionNote",
+          "warnings",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeNumber": {
+            "type": "string"
+          },
+          "employeeName": {
+            "type": "string"
+          },
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "bankCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankBranchCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accountNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accountName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mpesaPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "requestedByUserId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedByUserId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "decidedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "decisionNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "PaymentDetailsDto": {
+        "required": [
+          "paymentMethod",
+          "bankCode",
+          "bankBranchCode",
+          "accountNo",
+          "accountName",
+          "mpesaPhone"
+        ],
+        "type": "object",
+        "properties": {
+          "paymentMethod": {
+            "type": "string"
+          },
+          "bankCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankBranchCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accountNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accountName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mpesaPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PaymentDetailsInput": {
+        "required": [
+          "paymentMethod",
+          "bankCode",
+          "bankBranchCode",
+          "accountNo",
+          "accountName",
+          "mpesaPhone"
+        ],
+        "type": "object",
+        "properties": {
+          "paymentMethod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bankBranchCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accountNo": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accountName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mpesaPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "PermissionDto": {
         "required": [
           "code",
@@ -3768,6 +6876,153 @@
             "type": "string"
           },
           "requiresMfa": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PersonalDto": {
+        "required": [
+          "firstName",
+          "middleName",
+          "lastName",
+          "fullName",
+          "dateOfBirth",
+          "gender",
+          "citizenship",
+          "residencyStatus",
+          "phoneMobile",
+          "emailWork",
+          "emailPersonal",
+          "internGuardianConsent"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "citizenship": {
+            "type": "string"
+          },
+          "residencyStatus": {
+            "type": "string"
+          },
+          "phoneMobile": {
+            "type": "string"
+          },
+          "emailWork": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emailPersonal": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "internGuardianConsent": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PersonalInput": {
+        "required": [
+          "firstName",
+          "middleName",
+          "lastName",
+          "dateOfBirth",
+          "gender",
+          "citizenship",
+          "residencyStatus",
+          "phoneMobile",
+          "emailWork",
+          "emailPersonal",
+          "internGuardianConsent"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "middleName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lastName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dateOfBirth": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "gender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "citizenship": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "residencyStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phoneMobile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emailWork": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emailPersonal": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "internGuardianConsent": {
             "type": "boolean"
           }
         }
@@ -3979,6 +7234,153 @@
           }
         }
       },
+      "RecoveryCodesResponse": {
+        "required": [
+          "recoveryCodes"
+        ],
+        "type": "object",
+        "properties": {
+          "recoveryCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RegenerateRecoveryCodesRequest": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "RehireRequest": {
+        "required": [
+          "hireDate",
+          "assignment",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "hireDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "assignment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentInput"
+              }
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ReplaceEmergencyContactsRequest": {
+        "required": [
+          "contacts",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "contacts": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/EmergencyContactInput"
+            }
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RequestPaymentChangeRequest": {
+        "required": [
+          "details",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "details": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PaymentDetailsInput"
+              }
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RescindTerminationRequest": {
+        "required": [
+          "reason",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "ResetMfaRequest": {
+        "required": [
+          "version",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
       "RevokeRoleRequest": {
         "required": [
           "reason"
@@ -4128,6 +7530,82 @@
           }
         }
       },
+      "TerminateRequest": {
+        "required": [
+          "terminationDate",
+          "terminationType",
+          "reason",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "terminationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "terminationType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          }
+        }
+      },
+      "UpdateBankBranchRequest": {
+        "required": [
+          "bankName",
+          "branchName",
+          "isActive",
+          "version",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "bankName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "branchName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "UpdateBranchRequest": {
         "required": [
           "name",
@@ -4244,6 +7722,51 @@
           }
         }
       },
+      "UpdateEmployeeRequest": {
+        "required": [
+          "personal",
+          "identifiers",
+          "version",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "personal": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PersonalInput"
+              }
+            ]
+          },
+          "identifiers": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/IdentifiersInput"
+              }
+            ]
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "UpdateGradeRequest": {
         "required": [
           "name",
@@ -4343,6 +7866,12 @@
             "format": "uint32"
           },
           "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sourceReference": {
             "type": [
               "null",
               "string"
@@ -4567,6 +8096,32 @@
           }
         }
       },
+      "UploadImportRequest": {
+        "required": [
+          "legalEntityId",
+          "fileName",
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fileName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "content": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "UserDto": {
         "required": [
           "id",
@@ -4616,6 +8171,49 @@
             "items": {
               "$ref": "#/components/schemas/RoleAssignmentDto"
             }
+          }
+        }
+      },
+      "WorkPermitAlertDto": {
+        "required": [
+          "employeeId",
+          "employeeNumber",
+          "fullName",
+          "legalEntityId",
+          "workPermitExpiry",
+          "daysLeft",
+          "alert"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employeeNumber": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "legalEntityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workPermitExpiry": {
+            "type": "string",
+            "format": "date"
+          },
+          "daysLeft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "alert": {
+            "type": "string"
           }
         }
       },
@@ -4732,6 +8330,9 @@
     },
     {
       "name": "Organization"
+    },
+    {
+      "name": "People"
     }
   ]
 }

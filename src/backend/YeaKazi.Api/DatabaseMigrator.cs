@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using YeaKazi.BuildingBlocks.Tenancy;
 using YeaKazi.Organization.Persistence;
+using YeaKazi.People.Persistence;
 using YeaKazi.Platform.Persistence;
 
 namespace YeaKazi.Api;
@@ -25,6 +26,14 @@ public static class DatabaseMigrator
             .UseNpgsql(ownerConnectionString, o => o.MigrationsHistoryTable("__ef_migrations_history", OrganizationDbContext.Schema))
             .UseSnakeCaseNamingConvention().Options;
         await using (var db = new OrganizationDbContext(org, new RequestContext()))
+        {
+            await db.Database.MigrateAsync(ct);
+        }
+
+        var people = new DbContextOptionsBuilder<PeopleDbContext>()
+            .UseNpgsql(ownerConnectionString, o => o.MigrationsHistoryTable("__ef_migrations_history", PeopleDbContext.Schema))
+            .UseSnakeCaseNamingConvention().Options;
+        await using (var db = new PeopleDbContext(people, new RequestContext()))
         {
             await db.Database.MigrateAsync(ct);
         }

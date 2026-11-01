@@ -15,6 +15,7 @@ builder.Services.Configure<AuthOptions>(config.GetSection(AuthOptions.Section));
 builder.Services.AddFieldEncryption(config);
 builder.Services.AddSingleton<IEmailSender, FileDropEmailSender>();
 builder.Services.AddSingleton<IOutboxHandler, InvitationEmailHandler>();
+builder.Services.AddSingleton<IOutboxHandler, SecurityNoticeEmailHandler>();
 builder.Services.AddSingleton<OutboxDispatcher>();
 builder.Services.AddHostedService<OutboxWorker>();
 

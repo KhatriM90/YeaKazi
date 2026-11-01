@@ -7,6 +7,8 @@ using YeaKazi.Platform.AuditLog;
 using YeaKazi.Platform.Auth;
 using YeaKazi.Platform.Persistence;
 using YeaKazi.Platform.Provisioning;
+using YeaKazi.Platform.Rules;
+using YeaKazi.BuildingBlocks.Contracts;
 using YeaKazi.Platform.Users;
 
 namespace YeaKazi.Platform;
@@ -29,6 +31,8 @@ public static class PlatformModule
         services.AddScoped<RoleService>();
         services.AddScoped<AuditQueryService>();
         services.AddScoped<TenantProvisioningService>();
+        services.AddScoped<IRuleCatalog, RuleCatalog>();
+        services.AddScoped<MfaRecoveryService>();
         return services;
     }
 

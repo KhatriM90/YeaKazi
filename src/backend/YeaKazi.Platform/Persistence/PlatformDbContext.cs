@@ -25,6 +25,10 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
+    public DbSet<MfaRecoveryCode> MfaRecoveryCodes => Set<MfaRecoveryCode>();
+    public DbSet<RuleVersion> RuleVersions => Set<RuleVersion>();
+
+    public const string RulesSchema = "rules";
 
     protected override bool OwnsSharedTables => true;
 
@@ -148,6 +152,36 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
                 .AreNullsDistinct(false)
                 .HasFilter("revoked_at is null")
                 .HasDatabaseName("ux_user_role_assignments_active");
+        });
+
+        modelBuilder.Entity<MfaRecoveryCode>(b =>
+        {
+            b.ToTable("mfa_recovery_codes", IamSchema);
+            b.HasKey(x => x.Id);
+            b.Property(x => x.CodeHash).HasMaxLength(64).IsRequired();
+            b.HasIndex(x => new { x.TenantId, x.UserId }).HasFilter("used_at is null and revoked_at is null");
+            b.HasIndex(x => new { x.TenantId, x.CodeHash }).IsUnique();
+            b.HasOne<User>().WithMany().HasForeignKey(x => new { x.TenantId, x.UserId })
+                .HasPrincipalKey(x => new { x.TenantId, x.Id }).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RuleVersion>(b =>
+        {
+            b.ToTable("rule_versions", RulesSchema, t =>
+                t.HasCheckConstraint("ck_rule_versions_period", "effective_to is null or effective_to >= effective_from"));
+            b.HasKey(x => x.Id);
+            b.Property(x => x.Jurisdiction).HasMaxLength(10).IsRequired();
+            b.Property(x => x.RuleCode).HasMaxLength(100).IsRequired();
+            b.Property(x => x.VersionLabel).HasMaxLength(40).IsRequired();
+            b.Property(x => x.AuthoritySource).HasMaxLength(2000).IsRequired();
+            b.Property(x => x.Applicability).HasMaxLength(2000);
+            b.Property(x => x.Reviewer).HasMaxLength(200);
+            b.Property(x => x.Status).HasMaxLength(40).IsRequired();
+            b.Property(x => x.Payload).HasColumnType("jsonb").IsRequired();
+            b.Property(x => x.ContentHash).HasMaxLength(64).IsRequired();
+            b.Property(x => x.SourceFile).HasMaxLength(400).IsRequired();
+            b.HasIndex(x => new { x.Jurisdiction, x.RuleCode, x.VersionLabel }).IsUnique();
+            b.HasIndex(x => new { x.Jurisdiction, x.RuleCode, x.EffectiveFrom });
         });
     }
 }

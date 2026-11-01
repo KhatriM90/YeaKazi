@@ -82,7 +82,7 @@ public sealed class ApiFactory : WebApplicationFactory<YeaKazi.Api.ApiEntryPoint
         await using var ds = NpgsqlDataSource.Create(Database.WorkerConnectionString);
         var dispatcher = new OutboxDispatcher(
             new WorkerDataSource(ds),
-            [new InvitationEmailHandler(Email, encryptor, auth)],
+            [new InvitationEmailHandler(Email, encryptor, auth), new SecurityNoticeEmailHandler(Email)],
             Options.Create(new OutboxOptions { BatchSize = 100 }),
             NullLogger<OutboxDispatcher>.Instance);
         var total = 0;

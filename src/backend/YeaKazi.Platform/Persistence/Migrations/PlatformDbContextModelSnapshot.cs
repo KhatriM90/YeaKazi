@@ -309,6 +309,53 @@ namespace YeaKazi.Platform.Persistence.Migrations
                     b.ToTable("outbox_messages", "messaging");
                 });
 
+            modelBuilder.Entity("YeaKazi.Platform.Domain.MfaRecoveryCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("used_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_mfa_recovery_codes");
+
+                    b.HasIndex("TenantId", "CodeHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_mfa_recovery_codes_tenant_id_code_hash");
+
+                    b.HasIndex("TenantId", "UserId")
+                        .HasDatabaseName("ix_mfa_recovery_codes_tenant_id_user_id")
+                        .HasFilter("used_at is null and revoked_at is null");
+
+                    b.ToTable("mfa_recovery_codes", "iam");
+                });
+
             modelBuilder.Entity("YeaKazi.Platform.Domain.PlatformUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -479,6 +526,102 @@ namespace YeaKazi.Platform.Persistence.Migrations
                         .HasName("pk_role_permissions");
 
                     b.ToTable("role_permissions", "iam");
+                });
+
+            modelBuilder.Entity("YeaKazi.Platform.Domain.RuleVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Applicability")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("applicability");
+
+                    b.Property<DateOnly?>("ApprovedAt")
+                        .HasColumnType("date")
+                        .HasColumnName("approved_at");
+
+                    b.Property<string>("AuthoritySource")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("authority_source");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("content_hash");
+
+                    b.Property<DateOnly>("EffectiveFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("effective_from");
+
+                    b.Property<DateOnly?>("EffectiveTo")
+                        .HasColumnType("date")
+                        .HasColumnName("effective_to");
+
+                    b.Property<string>("Jurisdiction")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("jurisdiction");
+
+                    b.Property<DateTimeOffset>("LoadedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("loaded_at");
+
+                    b.Property<JsonDocument>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Reviewer")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("reviewer");
+
+                    b.Property<string>("RuleCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("rule_code");
+
+                    b.Property<string>("SourceFile")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)")
+                        .HasColumnName("source_file");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("VersionLabel")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("version_label");
+
+                    b.HasKey("Id")
+                        .HasName("pk_rule_versions");
+
+                    b.HasIndex("Jurisdiction", "RuleCode", "EffectiveFrom")
+                        .HasDatabaseName("ix_rule_versions_jurisdiction_rule_code_effective_from");
+
+                    b.HasIndex("Jurisdiction", "RuleCode", "VersionLabel")
+                        .IsUnique()
+                        .HasDatabaseName("ix_rule_versions_jurisdiction_rule_code_version_label");
+
+                    b.ToTable("rule_versions", "rules", t =>
+                        {
+                            t.HasCheckConstraint("ck_rule_versions_period", "effective_to is null or effective_to >= effective_from");
+                        });
                 });
 
             modelBuilder.Entity("YeaKazi.Platform.Domain.Tenant", b =>
@@ -774,6 +917,17 @@ namespace YeaKazi.Platform.Persistence.Migrations
                     NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("TenantId", "UserId", "RoleId", "LegalEntityId"), false);
 
                     b.ToTable("user_role_assignments", "iam");
+                });
+
+            modelBuilder.Entity("YeaKazi.Platform.Domain.MfaRecoveryCode", b =>
+                {
+                    b.HasOne("YeaKazi.Platform.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId", "UserId")
+                        .HasPrincipalKey("TenantId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_mfa_recovery_codes_users_tenant_id_user_id");
                 });
 
             modelBuilder.Entity("YeaKazi.Platform.Domain.Role", b =>
