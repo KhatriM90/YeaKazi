@@ -1,0 +1,116 @@
+/*
+ * YeaKazi "Savannah trust" design tokens.
+ * Brand values are fixed; everything else derives from them. Dark mode follows the
+ * OS setting unless the user picks one (data-theme on <html>).
+ */
+:root {
+  --brand-primary: #0f5e5a;
+  --brand-primary-light: #1d9e8e;
+  --brand-accent: #e8a33d;
+  --brand-background: #f4f1ea;
+  --brand-text: #1f2a2e;
+
+  --color-bg: var(--brand-background);
+  --color-surface: #ffffff;
+  --color-surface-muted: #ebe6db;
+  --color-border: #d9d2c3;
+  --color-text: var(--brand-text);
+  --color-text-muted: #55625f;
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: #0b4a47;
+  --color-primary-contrast: #ffffff;
+  --color-link: var(--brand-primary);
+  --color-accent: var(--brand-accent);
+  --color-focus: var(--brand-accent);
+  --color-danger: #b42318;
+  --color-danger-bg: #fdecea;
+  --color-success: #1e7a3c;
+  --color-success-bg: #e6f4ea;
+  --color-warning-bg: #fdf3e1;
+
+  /* Payroll run status colours (always shown with a text label). */
+  --status-draft: #6b7280;
+  --status-calculated: #2563eb;
+  --status-in-review: #b7791f;
+  --status-approved: #1e7a3c;
+  --status-locked: var(--brand-primary);
+  --status-rejected: #b42318;
+  --status-outcome-unknown: #7c3aed;
+
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --shadow-card: 0 1px 2px rgb(31 42 46 / 6%), 0 4px 12px rgb(31 42 46 / 6%);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #121a1b;
+    --color-surface: #1a2426;
+    --color-surface-muted: #223033;
+    --color-border: #2f4043;
+    --color-text: #e8ecea;
+    --color-text-muted: #a3b1ae;
+    --color-primary: var(--brand-primary-light);
+    --color-primary-hover: #25b5a3;
+    --color-primary-contrast: #06201e;
+    --color-link: #5fd0c0;
+    --color-danger: #f97066;
+    --color-danger-bg: #3a1c1a;
+    --color-success: #4ade80;
+    --color-success-bg: #12301f;
+    --color-warning-bg: #3a2c12;
+    --status-draft: #9ca3af;
+    --status-calculated: #60a5fa;
+    --status-in-review: #f6c25b;
+    --status-approved: #4ade80;
+    --status-locked: var(--brand-primary-light);
+    --status-rejected: #f97066;
+    --status-outcome-unknown: #a78bfa;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #121a1b;
+  --color-surface: #1a2426;
+  --color-surface-muted: #223033;
+  --color-border: #2f4043;
+  --color-text: #e8ecea;
+  --color-text-muted: #a3b1ae;
+  --color-primary: var(--brand-primary-light);
+  --color-primary-hover: #25b5a3;
+  --color-primary-contrast: #06201e;
+  --color-link: #5fd0c0;
+  --color-danger: #f97066;
+  --color-danger-bg: #3a1c1a;
+  --color-success: #4ade80;
+  --color-success-bg: #12301f;
+  --color-warning-bg: #3a2c12;
+  --status-draft: #9ca3af;
+  --status-calculated: #60a5fa;
+  --status-in-review: #f6c25b;
+  --status-approved: #4ade80;
+  --status-locked: var(--brand-primary-light);
+  --status-rejected: #f97066;
+  --status-outcome-unknown: #a78bfa;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+  color-scheme: dark;
+}
+
+/* Monetary values always use tabular figures. */
+.money,
+[data-money] {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
