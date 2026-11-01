@@ -40,10 +40,15 @@ export function AppShell() {
         </div>
         <nav aria-label="Main">
           <NavLink to="/" end>Home</NavLink>
+          {can('people.read') && <NavLink to="/people" end>Employees</NavLink>}
+          {can('people.write') && <NavLink to="/people/approvals">Approvals</NavLink>}
+          {can('people.write') && <NavLink to="/people/import">Import</NavLink>}
+          {can('people.read') && <NavLink to="/people/bank-branches">Bank branches</NavLink>}
           {can('org.read') && <NavLink to="/organization">Organization</NavLink>}
           {can('users.read') && <NavLink to="/users">Users</NavLink>}
           {can('users.read') && <NavLink to="/roles">Roles</NavLink>}
           {can('audit.read') && <NavLink to="/audit">Audit log</NavLink>}
+          <NavLink to="/security">Sign-in security</NavLink>
         </nav>
       </aside>
       <div className="main">

@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/mfa/recover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RecoverMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/activate": {
         parameters: {
             query?: never;
@@ -78,6 +94,22 @@ export interface paths {
         get: operations["GetMe"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/mfa/recovery-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RegenerateRecoveryCodes"];
         delete?: never;
         options?: never;
         head?: never;
@@ -142,6 +174,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["RevokeUserRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/mfa/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ResetUserMfa"];
         delete?: never;
         options?: never;
         head?: never;
@@ -580,6 +628,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/org/holiday-calendars/{id}/load-statutory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["LoadStatutoryHolidays"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/org/holidays/announce": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AnnounceHoliday"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/org/work-schedules": {
         parameters: {
             query?: never;
@@ -612,6 +692,390 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/people/employees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListEmployees"];
+        put?: never;
+        post: operations["CreateEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetEmployee"];
+        put: operations["UpdateEmployee"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/emergency-contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ReplaceEmergencyContacts"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetEmployeeHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AddAssignment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/assignments/{versionId}/correct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CorrectAssignment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/assignments/{versionId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CancelAssignment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/terminate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["TerminateEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/rescind-termination": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RescindTermination"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/rehire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RehireEmployee"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/employees/{id}/payment-changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RequestPaymentChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/payment-changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListPaymentChanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/payment-changes/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovePaymentChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/payment-changes/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RejectPaymentChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/work-permit-alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListWorkPermitAlerts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/bank-branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListBankBranches"];
+        put?: never;
+        post: operations["CreateBankBranch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/bank-branches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateBankBranch"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports/columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListImportColumns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DownloadImportTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListImports"];
+        put?: never;
+        post: operations["UploadImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetImport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListImportRows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports/{id}/commit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CommitImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/people/imports/{id}/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DiscardImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -620,6 +1084,93 @@ export interface components {
             tenant: string;
             token: string;
             password: string;
+        };
+        AddAssignmentRequest: {
+            /** Format: date */
+            effectiveFrom: string;
+            changeType: null | string;
+            assignment: null | components["schemas"]["AssignmentInput"];
+            reason: null | string;
+        };
+        AnnounceHolidayRequest: {
+            /** Format: date */
+            date: string;
+            name: string;
+            kind: string;
+            sourceReference: string;
+            calendarIds: null | string[];
+        };
+        AnnounceHolidayResult: {
+            added: components["schemas"]["HolidayDto"][];
+            skippedCalendarIds: string[];
+        };
+        AssignmentDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            episodeId: string;
+            /** Format: date */
+            effectiveFrom: string;
+            /** Format: date */
+            effectiveTo: null | string;
+            changeType: string;
+            status: string;
+            workerCategory: string;
+            payBasis: string;
+            jobTitle: null | string;
+            /** Format: date */
+            contractEndDate: null | string;
+            /** Format: date */
+            probationEndDate: null | string;
+            /** Format: uuid */
+            departmentId: null | string;
+            /** Format: uuid */
+            positionId: null | string;
+            /** Format: uuid */
+            branchId: null | string;
+            /** Format: uuid */
+            costCenterId: null | string;
+            /** Format: uuid */
+            gradeId: null | string;
+            /** Format: uuid */
+            workScheduleId: null | string;
+            /** Format: uuid */
+            managerEmployeeId: null | string;
+            managerName: null | string;
+            reason: null | string;
+            /** Format: uuid */
+            correctsVersionId: null | string;
+            isCancelled: boolean;
+            cancelReason: null | string;
+            /** Format: date-time */
+            cancelledAt: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        AssignmentInput: {
+            workerCategory: null | string;
+            payBasis: null | string;
+            jobTitle: null | string;
+            /** Format: date */
+            contractEndDate: null | string;
+            /** Format: date */
+            probationEndDate: null | string;
+            /** Format: uuid */
+            departmentId: null | string;
+            /** Format: uuid */
+            positionId: null | string;
+            /** Format: uuid */
+            branchId: null | string;
+            /** Format: uuid */
+            costCenterId: null | string;
+            /** Format: uuid */
+            gradeId: null | string;
+            /** Format: uuid */
+            workScheduleId: null | string;
+            /** Format: uuid */
+            managerEmployeeId: null | string;
         };
         AuditChainStatus: {
             valid: boolean;
@@ -652,6 +1203,17 @@ export interface components {
             correlationId: null | string;
             hash: string;
         };
+        BankBranchDto: {
+            /** Format: uuid */
+            id: string;
+            bankCode: string;
+            bankName: string;
+            branchCode: string;
+            branchName: string;
+            isActive: boolean;
+            /** Format: uint32 */
+            version: number | string;
+        };
         BranchDto: {
             /** Format: uuid */
             id: string;
@@ -661,6 +1223,17 @@ export interface components {
             name: string;
             address: null | string;
             isActive: boolean;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        CancelAssignmentRequest: {
+            reason: null | string;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        CorrectAssignmentRequest: {
+            assignment: null | components["schemas"]["AssignmentInput"];
+            reason: null | string;
             /** Format: uint32 */
             version: number | string;
         };
@@ -674,6 +1247,12 @@ export interface components {
             isActive: boolean;
             /** Format: uint32 */
             version: number | string;
+        };
+        CreateBankBranchRequest: {
+            bankCode: null | string;
+            bankName: null | string;
+            branchCode: null | string;
+            branchName: null | string;
         };
         CreateBranchRequest: {
             /** Format: uuid */
@@ -698,6 +1277,18 @@ export interface components {
             /** Format: uuid */
             costCenterId: null | string;
         };
+        CreateEmployeeRequest: {
+            /** Format: uuid */
+            legalEntityId: string;
+            employeeNumber: null | string;
+            /** Format: date */
+            hireDate: null | string;
+            personal: null | components["schemas"]["PersonalInput"];
+            identifiers: null | components["schemas"]["IdentifiersInput"];
+            emergencyContacts: null | components["schemas"]["EmergencyContactInput"][];
+            assignment: null | components["schemas"]["AssignmentInput"];
+            paymentDetails: null | components["schemas"]["PaymentDetailsInput"];
+        };
         CreateGradeRequest: {
             /** Format: uuid */
             legalEntityId: string;
@@ -717,6 +1308,7 @@ export interface components {
             date: string;
             name: string;
             kind: string;
+            sourceReference?: null | string;
         };
         CreateLegalEntityRequest: {
             code: string;
@@ -757,6 +1349,11 @@ export interface components {
             breakMinutes: number | string;
             workingDays: (number | string)[];
         };
+        DecidePaymentChangeRequest: {
+            note: null | string;
+            /** Format: uint32 */
+            version: number | string;
+        };
         DepartmentDto: {
             /** Format: uuid */
             id: string;
@@ -776,6 +1373,93 @@ export interface components {
             /** Format: uint32 */
             version: number | string;
             reason: string;
+        };
+        EmergencyContactDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            relationship: string;
+            phone: string;
+        };
+        EmergencyContactInput: {
+            name: null | string;
+            relationship: null | string;
+            phone: null | string;
+        };
+        EmployeeDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            legalEntityId: string;
+            employeeNumber: string;
+            status: string;
+            personal: components["schemas"]["PersonalDto"];
+            identifiers: components["schemas"]["IdentifiersDto"];
+            sensitiveMasked: boolean;
+            emergencyContacts: components["schemas"]["EmergencyContactDto"][];
+            paymentDetails: null | components["schemas"]["PaymentDetailsDto"];
+            pendingPaymentChange: null | components["schemas"]["PaymentChangeDto"];
+            currentEpisode: null | components["schemas"]["EpisodeDto"];
+            currentAssignment: null | components["schemas"]["AssignmentDto"];
+            statutoryGaps: string[];
+            workPermitAlert: null | string;
+            /** Format: uuid */
+            importBatchId: null | string;
+            /** Format: uint32 */
+            version: number | string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        EmployeeHistoryDto: {
+            /** Format: uuid */
+            employeeId: string;
+            /** Format: date */
+            today: string;
+            episodes: components["schemas"]["EpisodeHistoryDto"][];
+        };
+        EmployeeSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            legalEntityId: string;
+            employeeNumber: string;
+            fullName: string;
+            status: string;
+            jobTitle: null | string;
+            workerCategory: null | string;
+            /** Format: uuid */
+            departmentId: null | string;
+            /** Format: uuid */
+            positionId: null | string;
+            /** Format: uuid */
+            branchId: null | string;
+            /** Format: date */
+            hireDate: null | string;
+            /** Format: date */
+            terminationDate: null | string;
+            statutoryGaps: string[];
+        };
+        EpisodeDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            sequence: number | string;
+            /** Format: date */
+            hireDate: string;
+            /** Format: date */
+            terminationDate: null | string;
+            terminationType: null | string;
+            terminationReason: null | string;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        EpisodeHistoryDto: {
+            episode: components["schemas"]["EpisodeDto"];
+            versions: components["schemas"]["AssignmentDto"][];
+        };
+        FieldError: {
+            field: string;
+            message: string;
         };
         GradeDto: {
             /** Format: uuid */
@@ -810,9 +1494,80 @@ export interface components {
             date: string;
             name: string;
             kind: string;
+            sourceReference: null | string;
+            ruleVersion: null | string;
             isActive: boolean;
             /** Format: uint32 */
             version: number | string;
+        };
+        IdentifiersDto: {
+            nationalId: null | string;
+            passportNo: null | string;
+            workPermitNo: null | string;
+            /** Format: date */
+            workPermitExpiry: null | string;
+            kraPin: null | string;
+            nssfNo: null | string;
+            shaNo: null | string;
+            helbRef: null | string;
+            disabilityCertNo: null | string;
+            /** Format: date */
+            disabilityCertExpiry: null | string;
+        };
+        IdentifiersInput: {
+            nationalId: null | string;
+            passportNo: null | string;
+            workPermitNo: null | string;
+            /** Format: date */
+            workPermitExpiry: null | string;
+            kraPin: null | string;
+            nssfNo: null | string;
+            shaNo: null | string;
+            helbRef: null | string;
+            disabilityCertNo: null | string;
+            /** Format: date */
+            disabilityCertExpiry: null | string;
+        };
+        ImportBatchDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            legalEntityId: string;
+            fileName: string;
+            status: string;
+            /** Format: int32 */
+            totalRows: number | string;
+            /** Format: int32 */
+            errorRows: number | string;
+            /** Format: int32 */
+            validRows: number | string;
+            /** Format: uuid */
+            uploadedByUserId: null | string;
+            uploadedByDisplay: null | string;
+            /** Format: date-time */
+            uploadedAt: string;
+            /** Format: uuid */
+            committedByUserId: null | string;
+            /** Format: date-time */
+            committedAt: null | string;
+            canCommit: boolean;
+            commitBlockedReason: null | string;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        ImportColumnDto: {
+            name: string;
+            required: boolean;
+            description: string;
+        };
+        ImportRowDto: {
+            /** Format: int32 */
+            rowNumber: number | string;
+            employeeNumber: null | string;
+            name: null | string;
+            errors: components["schemas"]["FieldError"][];
+            /** Format: uuid */
+            employeeId: null | string;
         };
         InviteUserRequest: {
             email: string;
@@ -834,6 +1589,19 @@ export interface components {
             /** Format: uint32 */
             version: number | string;
         };
+        LoadStatutoryHolidaysRequest: {
+            /** Format: int32 */
+            year: number | string;
+        };
+        LoadStatutoryHolidaysResult: {
+            /** Format: uuid */
+            calendarId: string;
+            /** Format: int32 */
+            year: number | string;
+            added: components["schemas"]["HolidayDto"][];
+            alreadyPresent: string[];
+            notGenerated: string[];
+        };
         LoginRequest: {
             tenant: string;
             email: string;
@@ -845,6 +1613,7 @@ export interface components {
             /** Format: date-time */
             expiresAt: null | string;
             challengeToken: null | string;
+            recoveryCodes?: null | string[];
         };
         MeDto: {
             /** Format: uuid */
@@ -856,6 +1625,8 @@ export interface components {
             tenantName: string;
             tenantSlug: string;
             mfaEnabled: boolean;
+            /** Format: int32 */
+            recoveryCodesRemaining: number | string;
             permissions: string[];
             roles: components["schemas"]["RoleAssignmentDto"][];
         };
@@ -865,6 +1636,10 @@ export interface components {
         MfaEnrollResponse: {
             secret: string;
             otpAuthUri: string;
+        };
+        MfaRecoverRequest: {
+            challengeToken: string;
+            recoveryCode: string;
         };
         MfaVerifyRequest: {
             challengeToken: string;
@@ -906,6 +1681,15 @@ export interface components {
             /** Format: int32 */
             total: number | string;
         };
+        PagedResultOfEmployeeSummaryDto: {
+            items: components["schemas"]["EmployeeSummaryDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            total: number | string;
+        };
         PagedResultOfGradeDto: {
             items: components["schemas"]["GradeDto"][];
             /** Format: int32 */
@@ -924,8 +1708,35 @@ export interface components {
             /** Format: int32 */
             total: number | string;
         };
+        PagedResultOfImportBatchDto: {
+            items: components["schemas"]["ImportBatchDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            total: number | string;
+        };
+        PagedResultOfImportRowDto: {
+            items: components["schemas"]["ImportRowDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            total: number | string;
+        };
         PagedResultOfLegalEntityDto: {
             items: components["schemas"]["LegalEntityDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            total: number | string;
+        };
+        PagedResultOfPaymentChangeDto: {
+            items: components["schemas"]["PaymentChangeDto"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -969,10 +1780,86 @@ export interface components {
             /** Format: int32 */
             total: number | string;
         };
+        PaymentChangeDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            employeeId: string;
+            employeeNumber: string;
+            employeeName: string;
+            /** Format: uuid */
+            legalEntityId: string;
+            paymentMethod: string;
+            bankCode: null | string;
+            bankBranchCode: null | string;
+            accountNo: null | string;
+            accountName: null | string;
+            mpesaPhone: null | string;
+            source: string;
+            status: string;
+            reason: null | string;
+            /** Format: uuid */
+            requestedByUserId: null | string;
+            /** Format: date-time */
+            requestedAt: string;
+            /** Format: uuid */
+            decidedByUserId: null | string;
+            /** Format: date-time */
+            decidedAt: null | string;
+            decisionNote: null | string;
+            warnings: string[];
+            /** Format: uint32 */
+            version: number | string;
+        };
+        PaymentDetailsDto: {
+            paymentMethod: string;
+            bankCode: null | string;
+            bankBranchCode: null | string;
+            accountNo: null | string;
+            accountName: null | string;
+            mpesaPhone: null | string;
+        };
+        PaymentDetailsInput: {
+            paymentMethod: null | string;
+            bankCode: null | string;
+            bankBranchCode: null | string;
+            accountNo: null | string;
+            accountName: null | string;
+            mpesaPhone: null | string;
+        };
         PermissionDto: {
             code: string;
             description: string;
             requiresMfa: boolean;
+        };
+        PersonalDto: {
+            firstName: string;
+            middleName: null | string;
+            lastName: string;
+            fullName: string;
+            /** Format: date */
+            dateOfBirth: string;
+            gender: string;
+            citizenship: string;
+            residencyStatus: string;
+            phoneMobile: string;
+            emailWork: null | string;
+            emailPersonal: null | string;
+            internGuardianConsent: boolean;
+        };
+        PersonalInput: {
+            firstName: null | string;
+            middleName: null | string;
+            lastName: null | string;
+            /** Format: date */
+            dateOfBirth: null | string;
+            gender: null | string;
+            citizenship: null | string;
+            residencyStatus: null | string;
+            phoneMobile: null | string;
+            emailWork: null | string;
+            emailPersonal: null | string;
+            internGuardianConsent: boolean;
         };
         PlatformLoginRequest: {
             email: string;
@@ -1027,6 +1914,36 @@ export interface components {
             administratorUserId: string;
             seededRoles: string[];
         };
+        RecoveryCodesResponse: {
+            recoveryCodes: string[];
+        };
+        RegenerateRecoveryCodesRequest: {
+            code: string;
+        };
+        RehireRequest: {
+            /** Format: date */
+            hireDate: string;
+            assignment: null | components["schemas"]["AssignmentInput"];
+            reason: null | string;
+        };
+        ReplaceEmergencyContactsRequest: {
+            contacts: null | components["schemas"]["EmergencyContactInput"][];
+            reason: null | string;
+        };
+        RequestPaymentChangeRequest: {
+            details: null | components["schemas"]["PaymentDetailsInput"];
+            reason: null | string;
+        };
+        RescindTerminationRequest: {
+            reason: null | string;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        ResetMfaRequest: {
+            /** Format: uint32 */
+            version: number | string;
+            reason: string;
+        };
         RevokeRoleRequest: {
             reason: string;
         };
@@ -1069,6 +1986,22 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        TerminateRequest: {
+            /** Format: date */
+            terminationDate: string;
+            terminationType: null | string;
+            reason: null | string;
+            /** Format: uint32 */
+            version: number | string;
+        };
+        UpdateBankBranchRequest: {
+            bankName: null | string;
+            branchName: null | string;
+            isActive: boolean;
+            /** Format: uint32 */
+            version: number | string;
+            reason: null | string;
+        };
         UpdateBranchRequest: {
             name: string;
             address: null | string;
@@ -1091,6 +2024,13 @@ export interface components {
             /** Format: uuid */
             costCenterId: null | string;
             isActive: boolean;
+            /** Format: uint32 */
+            version: number | string;
+            reason: null | string;
+        };
+        UpdateEmployeeRequest: {
+            personal: null | components["schemas"]["PersonalInput"];
+            identifiers: null | components["schemas"]["IdentifiersInput"];
             /** Format: uint32 */
             version: number | string;
             reason: null | string;
@@ -1118,6 +2058,7 @@ export interface components {
             /** Format: uint32 */
             version: number | string;
             reason: null | string;
+            sourceReference?: null | string;
         };
         UpdateLegalEntityRequest: {
             name: string;
@@ -1165,6 +2106,12 @@ export interface components {
             version: number | string;
             reason: null | string;
         };
+        UploadImportRequest: {
+            /** Format: uuid */
+            legalEntityId: string;
+            fileName: null | string;
+            content: null | string;
+        };
         UserDto: {
             /** Format: uuid */
             id: string;
@@ -1177,6 +2124,19 @@ export interface components {
             /** Format: uint32 */
             version: number | string;
             roles: components["schemas"]["RoleAssignmentDto"][];
+        };
+        WorkPermitAlertDto: {
+            /** Format: uuid */
+            employeeId: string;
+            employeeNumber: string;
+            fullName: string;
+            /** Format: uuid */
+            legalEntityId: string;
+            /** Format: date */
+            workPermitExpiry: string;
+            /** Format: int32 */
+            daysLeft: number | string;
+            alert: string;
         };
         WorkScheduleDto: {
             /** Format: uuid */
@@ -1278,6 +2238,30 @@ export interface operations {
             };
         };
     };
+    RecoverMfa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaRecoverRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+        };
+    };
     ActivateAccount: {
         parameters: {
             query?: never;
@@ -1316,6 +2300,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeDto"];
+                };
+            };
+        };
+    };
+    RegenerateRecoveryCodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegenerateRecoveryCodesRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecoveryCodesResponse"];
                 };
             };
         };
@@ -1429,6 +2437,32 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RevokeRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+        };
+    };
+    ResetUserMfa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetMfaRequest"];
             };
         };
         responses: {
@@ -2523,6 +3557,56 @@ export interface operations {
             };
         };
     };
+    LoadStatutoryHolidays: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoadStatutoryHolidaysRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoadStatutoryHolidaysResult"];
+                };
+            };
+        };
+    };
+    AnnounceHoliday: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnounceHolidayRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnounceHolidayResult"];
+                };
+            };
+        };
+    };
     ListWorkSchedules: {
         parameters: {
             query?: {
@@ -2617,6 +3701,688 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WorkScheduleDto"];
+                };
+            };
+        };
+    };
+    ListEmployees: {
+        parameters: {
+            query?: {
+                legalEntityId?: string;
+                search?: string;
+                status?: string;
+                departmentId?: string;
+                page?: number | string;
+                pageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfEmployeeSummaryDto"];
+                };
+            };
+        };
+    };
+    CreateEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeDto"];
+                };
+            };
+        };
+    };
+    GetEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeDto"];
+                };
+            };
+        };
+    };
+    UpdateEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeDto"];
+                };
+            };
+        };
+    };
+    ReplaceEmergencyContacts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceEmergencyContactsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeDto"];
+                };
+            };
+        };
+    };
+    GetEmployeeHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    AddAssignment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    CorrectAssignment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CorrectAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    CancelAssignment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    TerminateEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TerminateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    RescindTermination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RescindTerminationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    RehireEmployee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RehireRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeHistoryDto"];
+                };
+            };
+        };
+    };
+    RequestPaymentChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestPaymentChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentChangeDto"];
+                };
+            };
+        };
+    };
+    ListPaymentChanges: {
+        parameters: {
+            query?: {
+                status?: string;
+                legalEntityId?: string;
+                page?: number | string;
+                pageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfPaymentChangeDto"];
+                };
+            };
+        };
+    };
+    ApprovePaymentChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecidePaymentChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentChangeDto"];
+                };
+            };
+        };
+    };
+    RejectPaymentChange: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecidePaymentChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentChangeDto"];
+                };
+            };
+        };
+    };
+    ListWorkPermitAlerts: {
+        parameters: {
+            query?: {
+                legalEntityId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkPermitAlertDto"][];
+                };
+            };
+        };
+    };
+    ListBankBranches: {
+        parameters: {
+            query?: {
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankBranchDto"][];
+                };
+            };
+        };
+    };
+    CreateBankBranch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBankBranchRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankBranchDto"];
+                };
+            };
+        };
+    };
+    UpdateBankBranch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBankBranchRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankBranchDto"];
+                };
+            };
+        };
+    };
+    ListImportColumns: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportColumnDto"][];
+                };
+            };
+        };
+    };
+    DownloadImportTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    ListImports: {
+        parameters: {
+            query?: {
+                legalEntityId?: string;
+                page?: number | string;
+                pageSize?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfImportBatchDto"];
+                };
+            };
+        };
+    };
+    UploadImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadImportRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDto"];
+                };
+            };
+        };
+    };
+    GetImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDto"];
+                };
+            };
+        };
+    };
+    ListImportRows: {
+        parameters: {
+            query?: {
+                onlyErrors?: boolean;
+                page?: number | string;
+                pageSize?: number | string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedResultOfImportRowDto"];
+                };
+            };
+        };
+    };
+    CommitImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDto"];
+                };
+            };
+        };
+    };
+    DiscardImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportBatchDto"];
                 };
             };
         };

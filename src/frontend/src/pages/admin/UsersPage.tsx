@@ -19,6 +19,7 @@ export function UsersPage() {
   const [invite, setInvite] = useState<{ email: string; displayName: string; roleId: string; legalEntityId: string } | null>(null)
   const [grant, setGrant] = useState<{ user: User; roleId: string; legalEntityId: string } | null>(null)
   const [disable, setDisable] = useState<{ user: User; reason: string } | null>(null)
+  const [resetMfa, setResetMfa] = useState<{ user: User; reason: string } | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const manage = can('users.manage')
 
@@ -92,6 +93,7 @@ export function UsersPage() {
                   <td className="row">
                     {manage && u.id !== me?.userId && <button className="btn-link" onClick={() => { setFieldErrors({}); setGrant({ user: u, roleId: '', legalEntityId: '' }) }}>Add role</button>}
                     {manage && u.id !== me?.userId && u.status !== 'disabled' && <button className="btn-link" onClick={() => { setFieldErrors({}); setDisable({ user: u, reason: '' }) }}>Disable</button>}
+                    {manage && u.id !== me?.userId && u.mfaEnabled && <button className="btn-link" onClick={() => { setFieldErrors({}); setResetMfa({ user: u, reason: '' }) }}>Reset MFA</button>}
                   </td>
                 </tr>
               ))}
@@ -133,6 +135,13 @@ export function UsersPage() {
         onSubmit={() => disable && run(() => call(api.POST('/api/v1/users/{id}/disable', { params: { path: { id: disable.user.id } }, body: { version: Number(disable.user.version), reason: disable.reason } })), 'User disabled. Their sessions end immediately.', () => setDisable(null))}>
         {fieldErrors._form && <div className="alert alert-error" role="alert">{fieldErrors._form}</div>}
         {disable && <TextField label="Reason (recorded in the audit log)" value={disable.reason} onChange={(v) => setDisable({ ...disable, reason: v })} required error={fieldErrors.reason} />}
+      </Dialog>
+
+      <Dialog open={!!resetMfa} danger title={`Reset multi-factor sign-in for ${resetMfa?.user.displayName ?? ''}`} submitLabel="Reset MFA" onClose={() => setResetMfa(null)}
+        onSubmit={() => resetMfa && run(() => call(api.POST('/api/v1/users/{id}/mfa/reset', { params: { path: { id: resetMfa.user.id } }, body: { version: Number(resetMfa.user.version), reason: resetMfa.reason } })), 'MFA reset. They are signed out and must set up an authenticator at their next sign-in. They were notified by email.', () => setResetMfa(null))}>
+        {fieldErrors._form && <div className="alert alert-error" role="alert">{fieldErrors._form}</div>}
+        <p className="muted">Use this only after confirming the person's identity, for example in person or by a call-back to a known number. Their authenticator and recovery codes stop working.</p>
+        {resetMfa && <TextField label="How you verified their identity (recorded in the audit log)" value={resetMfa.reason} onChange={(v) => setResetMfa({ ...resetMfa, reason: v })} required error={fieldErrors.reason} />}
       </Dialog>
     </div>
   )

@@ -46,7 +46,7 @@ disable themselves. The last active tenant administrator cannot be removed or di
 The 8 system roles from Section 6 are read-only; tenants create custom roles for
 variations. Role assignments may be limited to specific legal entities.
 
-**A-08 Public holidays are not seeded.** We do not invent Kenyan gazetted holiday dates.
+**A-08 Public holidays are not seeded.** *Superseded by A-16 (S2).* We do not invent Kenyan gazetted holiday dates.
 Holiday calendars start empty and are maintained by HR (every change is audited and emits
 `org.holiday_changed`). A seeded calendar needs an approved source (open question Q-01).
 
@@ -80,4 +80,116 @@ employers.
 **A-15 Deferred to later slices.** Pay groups move to the payroll slice (S3) because they
 depend on pay calendars. Seeding of rule packs, leave types and document templates at
 provisioning is deferred to the slices that own them (S3, S4, S8). The PostgreSQL job
-queue (beyond the outbox) is deferred to S2.
+queue (beyond the outbox) is deferred to S2. *Updated in S2 (A-28): the general job queue moves to S3,
+where payroll calculation is the first long-running job.*
+
+## S2 Employees (2026-11-01)
+
+**A-16 Kenya public holidays come from a rule version.** Manish supplied the fixed-date list
+(2026-11-01). It lives in `rules/ke/calendar/public-holidays.v2026.1.json`, effective from
+2026-01-01, and is loaded into the immutable `rules.rule_versions` table by `load-rules`.
+Status is `seed_pending_specialist_signoff` until a Kenyan payroll/legal specialist signs
+it. Nothing about holidays is hard-coded in C#. New tenants get a `KE-PUBLIC` calendar for
+the current and next year; if no rule version exists the seed is skipped and audited
+(`org.holiday_calendar.statutory_missing`), never guessed. Mazingira Day is 10 October as
+in the Act; Utamaduni Day and Huduma Day are not in the Act and are not generated.
+
+**A-17 Sunday rule follows section 4 of the Public Holidays Act (Cap. 110) exactly.**
+"Where a day in Part I of the Schedule falls on a Sunday, the first succeeding day, not
+being a public holiday, shall be a public holiday and the first-mentioned day shall cease to
+be a public holiday." So the Sunday itself is *not* a holiday, and if Monday is already a
+holiday the day moves to Tuesday (e.g. 2033: Christmas Sunday 25 Dec moves to Tuesday 27
+Dec because Boxing Day is Monday). Source:
+https://new.kenyalaw.org/akn/ke/act/1912/21/eng@2024-04-26. The moved day is labelled
+"(moved from Sunday d MMM)".
+
+**A-18 Movable and ad-hoc holidays are entered by people, with a source.** Good Friday,
+Easter Monday and Idd-ul-Fitr are listed as `notGenerated` in the rule file and are added
+per year. Government announcements use `POST /api/v1/org/holidays/announce` (adds to every
+calendar the user may change, skips duplicates). Gazetted and short-notice holidays require
+a `sourceReference` such as "Gazette Notice No. 1234 of 2026"; company days do not.
+Removing a holiday requires a reason. Every change is audited and emits `org.holiday_changed`.
+
+**A-19 MFA recovery (A-04 kept).** TOTP stays mandatory for privileged roles. On enrolment
+the user gets 10 single-use recovery codes (shown once, stored as SHA-256 of user id +
+code). Using one counts toward lockout like a wrong TOTP, is audited and emails the user.
+Regenerating codes needs a current TOTP code and cancels the old set. A tenant administrator
+(users.manage) can reset another user's MFA with a reason (cannot reset their own); this
+rotates the security stamp, ends sessions, revokes codes and emails the user. Recovery codes
+and admin reset cover tenant users only; platform operators still need an operator
+re-enrolment (gap).
+
+**A-20 Required identifiers at hire.** KRA PIN and (national ID or passport) are required.
+Non-citizens must give a passport, work permit number and an unexpired permit expiry.
+NSSF and SHA numbers are optional at hire because new hires often register after joining,
+but they are reported as statutory gaps on the employee and must be present before payroll
+approval (PAY-05, S3). Contractors are not expected to have NSSF/SHA. Identifiers are
+unique per legal employer, not across the tenant.
+
+**A-21 Format checks only.** We validate shapes (individual KRA PIN `A#########X`, national
+ID 6–9 digits, NSSF digits) but do not call KRA iTax, IPRS or NSSF to verify numbers.
+
+**A-22 Identifiers are restricted.** National ID, passport, permit, KRA PIN, NSSF, SHA,
+HELB and disability certificate are masked (last 3 characters) unless the user holds
+`people.sensitive.read` for that employer. Each unmasked view is audited
+(`people.employee.sensitive_viewed`). Audit snapshots mask them too. Only holders of the
+sensitive permission may change them.
+
+**A-23 Employment history is effective-dated and never overwritten.** Each employment is
+an episode (hire to termination); job, organization placement, worker category and pay
+basis are assignment versions with an effective-from date. Back-dated and future-dated
+changes are allowed and audited. A mistake is fixed by "correct", which keeps the original
+marked cancelled and links the replacement; a future change can be cancelled. A database
+trigger rejects any update that rewrites a version's content or an episode's hire date,
+even for the schema owner. Termination is a date on the episode (future-dated allowed and
+can be withdrawn before it takes effect); rehire opens a new episode and keeps the old one.
+The employee number never changes.
+
+**A-24 Worker category limits pay basis.** Casual: daily or hourly. Piece-rate: piece
+rate only. Contractor: any basis, and flagged as non-employee for statutory purposes.
+Permanent, fixed-term, probation and intern: monthly, daily or hourly. Fixed-term needs a
+contract end date and probation needs a probation end date. Under-18s may be hired only as
+interns with recorded guardian consent.
+
+**A-25 Payment details need a second person.** Bank/M-Pesa/cash details are never applied
+directly. They are a pending change that someone other than the requester approves (the
+requester can only withdraw). One pending change per employee. On import, committing the
+batch (which the uploader cannot do) is the second-person approval. Bank details are
+checked against a tenant-maintained bank/branch reference table.
+
+**A-26 Bank reference table is maintained by the tenant.** We have no approved, current
+source of Kenyan bank and branch codes to seed, so we do not invent them. HR adds the codes
+their bank publishes. Seeding from a CBK/KBA source is open question Q-02.
+
+**A-27 Import (MIG-01, employees) is all-or-nothing and four-eyes.** CSV only (UTF-8, up
+to 2,000 rows and 4 MB), dates as YYYY-MM-DD or DD/MM/YYYY, phones normalized to
++254 format. Every row is validated before anything is saved and errors are shown per row
+and column. A batch with any error cannot be committed: the user fixes the file and uploads
+again. A different user with `people.write` commits; commit re-validates against current
+data and creates everyone in one transaction. Managers may refer to another row in the
+same file. Cells that look like spreadsheet formulas are neutralised when we write CSV.
+
+**A-28 Import runs in the API request.** 2,000 rows validate and commit in a few seconds,
+so the general job queue (A-15) moves to S3 where payroll calculation needs it.
+
+**A-29 Salary is not part of S2.** Salary and recurring pay elements are versioned in the
+payroll slice (S3); S2 stores pay basis only.
+
+**A-30 Gender values are female, male or intersex** and are used only for statutory leave
+eligibility (S4).
+
+**A-31 Not yet in S2.** Linking a user account to an employee record, and automatic access
+removal on termination, come with the employee portal (ESS). Work-permit alerts (60/30/7
+days and expired) are listed on the HR home page; email reminders come with notifications.
+
+**A-32 Employee list filters by status/department in memory** after loading the tenant's
+employees for the selected employer. Fine for S2 volumes (thousands); a materialised
+"current assignment" view is planned when reporting needs it.
+
+### Open questions
+- **Q-01** (S1) Approved source for Kenyan public holidays. *Answered 2026-11-01 by Manish:
+  fixed-date list supplied; ad-hoc holidays entered by authorised admins (A-16 to A-18).*
+- **Q-02** Is there an approved, maintained source of Kenyan bank and branch codes (CBK or
+  Kenya Bankers Association) we may seed from? Until then tenants maintain the table (A-26).
+- **Q-03** Should NSSF and SHA numbers become mandatory at hire for statutory employees,
+  or is "required before first payroll" (A-20) right?

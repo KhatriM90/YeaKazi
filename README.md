@@ -52,6 +52,14 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/backend/YeaKazi.Api 
 Migrations run as `yeakazi_owner` and install row-level security, grants, audit
 triggers and the hash chain.
 
+Then load the statutory rule versions from `/rules` (Kenya public holidays in S2). Rule
+versions are immutable; re-running skips unchanged files and refuses a changed file that
+keeps the same version label:
+
+```bash
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/backend/YeaKazi.Api --no-launch-profile -- load-rules --path rules
+```
+
 ## 3. Create the first platform administrator
 
 ```bash

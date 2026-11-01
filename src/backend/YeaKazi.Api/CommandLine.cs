@@ -26,7 +26,7 @@ public static class CommandLine
                 var ownerCs = app.Configuration.GetConnectionString("Migrations")
                               ?? throw new InvalidOperationException("ConnectionStrings:Migrations is not configured.");
                 var path = OptionalArg(args, "--path") ?? "rules";
-                var result = await RuleLoader.LoadAsync(ownerCs, Path.GetFullPath(path));
+                var result = await RuleLoader.LoadAsync(ownerCs, ResolveFolder(path));
                 foreach (var m in result.Messages) Console.WriteLine(m);
                 Console.WriteLine($"Rules loaded: {result.Loaded}; unchanged: {result.Unchanged}.");
                 return true;
@@ -46,6 +46,29 @@ public static class CommandLine
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// A relative path is looked up from the working directory and then its parents, because
+    /// <c>dotnet run</c> starts in the project folder while the rules live at the repository root.
+    /// </summary>
+    private static string ResolveFolder(string path)
+    {
+        if (Path.IsPathRooted(path))
+        {
+            return path;
+        }
+
+        for (var dir = new DirectoryInfo(Environment.CurrentDirectory); dir is not null; dir = dir.Parent)
+        {
+            var candidate = Path.Combine(dir.FullName, path);
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return Path.GetFullPath(path);
     }
 
     private static string? OptionalArg(string[] args, string name)

@@ -15,6 +15,12 @@ import { UsersPage } from './pages/admin/UsersPage'
 import { HomePage } from './pages/HomePage'
 import { OrganizationPage } from './pages/org/OrganizationPage'
 import { PlatformConsole } from './pages/platform/PlatformConsole'
+import { SecurityPage } from './pages/account/SecurityPage'
+import { ApprovalsPage } from './pages/people/ApprovalsPage'
+import { BankBranchesPage } from './pages/people/BankBranchesPage'
+import { EmployeePage } from './pages/people/EmployeePage'
+import { EmployeesPage } from './pages/people/EmployeesPage'
+import { ImportPage } from './pages/people/ImportPage'
 
 applyTheme(savedTheme())
 
@@ -45,6 +51,12 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/users" element={<UsersPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/audit" element={<AuditPage />} />
+            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/people" element={<EmployeesPage />} />
+            <Route path="/people/approvals" element={<ApprovalsPage />} />
+            <Route path="/people/import" element={<ImportPage />} />
+            <Route path="/people/bank-branches" element={<BankBranchesPage />} />
+            <Route path="/people/:id" element={<EmployeePage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
